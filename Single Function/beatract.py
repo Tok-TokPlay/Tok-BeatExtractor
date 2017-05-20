@@ -58,12 +58,13 @@ def take_local_maximum(CQT_result, threshold) :
     return result
 
 
-def get_threshold(CQT_result, seed = 0.75) :
+def get_threshold(CQT_result, seed = 0.75, result_hop = 1000) :
     '''
     Return the threshold number for CQT_result with differential value.
-    Args : CQT_result, seed
+    Args : CQT_result, seed, result_hop
    		CQT_result - the list of CQT's output.
-        seed - the seed of how far from standard value to mim / max values.
+        seed - the seed of how far from standard value to mim / max values. default is 0.75 and this value should be real value at 0.5 ~ 1.
+		result_hop - ignore value to take tangent of values. default is 1000
     Returns : 
 		min / max value of threshold. threshold value.
     Raises : 
@@ -77,23 +78,55 @@ def get_threshold(CQT_result, seed = 0.75) :
     result_list.sort()
     # Copy List to sort result.
     sorted_tangent = []
-    # Using Differential
-    for i in range(0, len(result_list) - 10) :
-        sorted_tangent.append((result_list[i + 10] - result_list[i]) / 10)
+    # to using Differential, get tangent values.
+    for i in range(0, len(result_list) - result_hop) :
+        sorted_tangent.append((result_list[i + result_hop] - result_list[i]) / result_hop)
         maximum_tangent = 0
         maximum_index = -1
         for i in range(0, len(sorted_tangent)) :
             if maximum_tangent < sorted_tangent[i] :
                 maximum_tangent = sorted_tangent[i]
                 maxumum_index = i
-        small_tangent_index = -1
-        large_tangent_index = -1
-        for i in range(0, len(sorted_tangent)) :
-            if small_tangent_index == -1 :
-                if sorted_tangent[i] > (1 - seed) * maximum_tangent :
-                    small_tangent_index = i
-            if large_tangent_index == -1 :
-                if sorted_tangent[i] > (seed) * maximum_tangent :
-                    large_tangent_index = i
+		
+	small_tangent_index = -1
+	large_tangent_index = -1
+	# get result with calcuated tangent values.
+	for i in range(0, len(sorted_tangent)) :
+ 		if small_tangent_index == -1 :
+			if sorted_tangent[i] > (1 - seed) * maximum_tangent :
+				small_tangent_index = i
+		if large_tangent_index == -1 :
+			if sorted_tangent[i] > (seed) * maximum_tangent :
+				large_tangent_index = i
 
     return result_list[small_tangent_index], result_list[large_tangent_index]
+
+def parse_noise(CQT_result, MAG_threshold) :
+    '''
+    parsing noise of CQT_result. result will be real harmonic sound which is bigger then threshold.
+    Args : CQT_result, MAG_threshold
+		CQT_result - 
+		MAG_threshold -  
+    Returns : 
+    Raises : 
+        nothing.
+    '''
+    CQT_noise = []
+    CQT_harmonic = []
+    for f in range(0, len(CQT_result)) :
+        CQT_noise.append([])
+        CQT_harmonic.append([])
+
+    for f in range(0, len(CQT_result)):
+        for t in range(0, len(CQT_result[0])):
+            if abs(CQT_result[f][t]) > MAG_threshold :
+                CQT_harmonic[f].append(CQT_result[f][t])
+                CQT_noise[f].append(0)
+            else :
+                CQT_harmonic[f].append(0)
+                CQT_noise[f].append(CQT_result[f][t])
+
+    return CQT_noise, CQT_harmonic
+
+
+
