@@ -105,27 +105,35 @@ def parse_noise(CQT_result, MAG_threshold) :
     '''
     parsing noise of CQT_result. result will be real harmonic sound which is bigger then threshold.
     Args : CQT_result, MAG_threshold
-		CQT_result - 
-		MAG_threshold -  
-    Returns : 
+		CQT_result - Mixture of CQT_result that big sound and small sound.
+		MAG_threshold - Standard for judge big and small.
+    Returns : CQT_noise, CQT_harmonic
+		CQT_noise - small sound which judged to noise sound.
+		CQT_harmonic - big sound which judged to big sound.
     Raises : 
         nothing.
     '''
+	# Make empty 2 by 2 list.
+	# Dimension of output list is same as CQT_result (input list).
     CQT_noise = []
     CQT_harmonic = []
     for f in range(0, len(CQT_result)) :
         CQT_noise.append([])
         CQT_harmonic.append([])
-
-    for f in range(0, len(CQT_result)):
-        for t in range(0, len(CQT_result[0])):
+	
+    for f in range(0, len(CQT_result)) :
+	# f is frequency ( Note, CQT values ).
+        for t in range(0, len(CQT_result[0])) :
+		# t is time.
             if abs(CQT_result[f][t]) > MAG_threshold :
+			# if bigger then MAG_threshold...
                 CQT_harmonic[f].append(CQT_result[f][t])
                 CQT_noise[f].append(0)
             else :
+			# if smaller then MAG_threshold
                 CQT_harmonic[f].append(0)
                 CQT_noise[f].append(CQT_result[f][t])
-
+	
     return CQT_noise, CQT_harmonic
 
 
