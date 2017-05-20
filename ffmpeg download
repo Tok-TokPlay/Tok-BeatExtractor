@@ -1,0 +1,11 @@
+http://b1ix.net/184
+
+wget http://ffmpeg.org/releases/ffmpeg-2.5.3.tar.bz2
+sudo apt-get install yasm
+tar -xvjf ffmpeg-2.5.3.tar.bz2
+cd ffmpeg-2.5.3
+./configure
+sudo make
+sudo make install
+
+ffmpeg 로 바로 사용 가능
