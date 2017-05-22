@@ -181,7 +181,7 @@ def get_scale_simmilarity(scale_set) :
 	'''
 	take scale and calculate simmilarity with DTW of each scale set.
 	Args : scale_set ( list )
-		scale_set - 
+		scale_set - set of values which magnitude over threshold. ( Real Note of music. )
 	Returns : DTW_value.
 		DTW_value - 
 	Raises :
@@ -203,9 +203,11 @@ def get_scale_simmilarity(scale_set) :
 
 def make_empty_list(a = -1, b = -1, c = -1, d = -1) :
 	'''
-	take empty 
+	take empty list dimension. -1 is not using dimension.
 	Args : 
+		empty list dimension. -1 = not using ( default )
 	Returns : 
+		multi dimension empty list.
 	Raises :
 		nothing
 	'''
@@ -235,4 +237,5 @@ def make_empty_list(a = -1, b = -1, c = -1, d = -1) :
             for i2 in range(0, c) :
                 for i3 in range(0, d) :
                     result_list[i1][i2].append([])
+	# Can make it with recursive function with dimension list.
     return result_list
