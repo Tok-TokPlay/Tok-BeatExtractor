@@ -136,5 +136,103 @@ def parse_noise(CQT_result, MAG_threshold) :
 	
     return CQT_noise, CQT_harmonic
 
+def get_scale(CQT_harmonic) :
+	'''
+	input CQT_harmonics and decompose it to scalse set and it's play tim.
+	magnitude which smaller then threshold will be deleted to 0.
+	Args : CQT_harmonics ( list )
+		CQT_harmonics - noise removed harmonics which magnitude are over threshold.
+	Returns : scale_set, time_set ( list )
+		sacle_set - gathered multi-dimension list which magnitude are over threshold. ( 0 removed list )
+		time_set - time sacle is start is time_set[i][0], time scale is finish is time_set[1]
+	Raises : 
+		Nothing
+	'''
+    time_set = []
+    scale_set = []
 
+    for f in range(0, len(CQT_harmonic)) :
+        scale_set.append([])
+        time_set.append([])
 
+    recording = False
+    st = 0
+    ft = 0
+    temp = []
+    for f in range(0, len(CQT_harmonic)) :
+        for t in range(0, len(CQT_harmonic[0])) :
+            if recording == True :
+                if abs(CQT_harmonic[f][t]) == 0 :
+                    ft = t - 1
+                    scale_set[f].append(temp)
+                    time_set[f].append([st,ft])
+                    recording = False
+                    temp = []
+                else :
+                    temp.append(CQT_harmonic[f][t])
+            else :
+                if abs(CQT_harmonic[f][t]) != 0 :
+                    st = t
+                    recording = True
+                    temp.append(CQT_harmonic[f][t])
+    return scale_set, time_set
+
+def get_scale_simmilarity(scale_set) :
+	'''
+	take scale and calculate simmilarity with DTW of each scale set.
+	Args : scale_set ( list )
+		scale_set - 
+	Returns : DTW_value.
+		DTW_value - 
+	Raises :
+		nothing
+	'''
+    scale_list = []
+    DTW_value = []
+    for f in range(0, len(scale_set)) :
+        for t in range(0, len(scale_set[f])) :
+            scale_list.append(scale_set[f][t])
+            DTW_value.append([])
+    for i in range(0, len(scale_list)) :
+        for j in range(0, len(scale_list)) :
+            if j < i :
+                DTW_value[i].append(DTW_value[j][i])
+            else : 
+                DTW_value[i].append(MCC_with_DTW(scale_list[i], scale_list[j]))    
+    return DTW_value
+
+def make_empty_list(a = -1, b = -1, c = -1, d = -1) :
+	'''
+	take empty 
+	Args : 
+	Returns : 
+	Raises :
+		nothing
+	'''
+    result_list = []
+    # One Dimension list.
+    if a != -1 and b == -1:
+        result_list = []
+    # Two Dimension list.
+    elif b != -1 and c == -1 :
+        for i1 in range(0, b) :
+            result_list.append([])
+    # Three Dimension list.
+    elif c != -1 and d == -1 :
+        for i1 in range(0, b) :
+            result_list.append([])
+        for i1 in range(0, b) :
+            for i2 in range(0, c) :
+                result_list[i1].append([])
+    # Four Dimension list.
+    else :
+        for i1 in range(0, b) :
+            result_list.append([])
+        for i1 in range(0, b) :
+            for i2 in range(0, c) :
+                result_list[i1].append([])
+        for i1 in range(0, b) :
+            for i2 in range(0, c) :
+                for i3 in range(0, d) :
+                    result_list[i1][i2].append([])
+    return result_list
