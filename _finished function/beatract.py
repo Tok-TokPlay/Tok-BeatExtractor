@@ -264,10 +264,35 @@ def make_empty_list_recursion(dimension, to_make)	:
 def stage_note(r_harmonics) : 
 	'''
 	stage notes to make decision which notes are same instrumental.
-	Args : 
-		
-	Returns :
-		
+	Args : r_harmonics
+		r_harmonics - real harmonics value map with 0 which is smaller then threshold.
+	Returns : note_map
+		note_map - for all time sequence, clustering all notes to list.
 	Raises : 
 		nothing
 	'''
+	note = []
+	# Initialize note list.
+	for t in range(0, len(r_harmonics)) :
+		note.append([])
+		note_number = 0
+		on_writng = False
+		# Initialize note[] list and set on_writing to false, because start must be start with not writing.
+		for f in range(0, len(r_harmonics[0])) :
+			if harmonic[f][t] == 0 : 
+				if on_writing :
+					on_writing = False
+					note_number += 1					
+					# At writing some note to list, if meet 0 then stop writing and get ready to input next note.
+					# if not writing, befores are 
+			elif : 
+				if on_writing : 
+					# Keep writing.
+					# writing which frequency is at "note_number"`s note.
+					note[t][note_number].append(f)
+				elif : 
+					# if note doesn't write, then turn on write flag ( on_writing ) and append list and "f".
+					on_writing = True
+					note[t].append([])
+					note[t][note_number].append(f)
+	return note
