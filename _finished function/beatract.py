@@ -239,3 +239,25 @@ def make_empty_list(a = -1, b = -1, c = -1, d = -1) :
                     result_list[i1][i2].append([])
 	# Can make it with recursive function with dimension list.
     return result_list
+
+def make_empty_list_recursion(dimension, to_make)	:
+	'''
+	take empty list dimension with list of "dimension", make empty list, return it.
+	Args : dimension[], to_make[][]...
+		dimension - list of dimension to make empty list.
+		to_make - list to make empty list in it.
+	Returns : to_make
+		to_make - input parameter to make empty list.
+	Raises : 
+		nothing.
+	'''
+	if len(dimension) > 1 :
+		for i in range(0, dimension[-1]) : 
+			to_make.append([])
+			make_empty_list_recursion(dimension[0:(len(dimension)-2)], to_make[i])
+			# Recursion part to 0 ~ len(dimension) - 2 with making empty list at to_make[i].
+	elif len(dimension) == 1 : 
+		for i in range(0, dimension[0]) :
+			to_make.append([])
+		return to_make	
+		# if len(dimension) is one, then stop recursion and return to_make list so can process other part of functions.
