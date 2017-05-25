@@ -335,8 +335,11 @@ def mid(note) :
 	Raises : 
 		nothing	
 	'''
-
-
+	average = 0
+	for i in range(0, len(note)) :
+		average += note[i]
+	# just return average of note`s contents.
+	return average / len(note)
 
 def distance(note1, note2)	:
 	'''
