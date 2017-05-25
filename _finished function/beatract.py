@@ -408,12 +408,13 @@ def farnote(t0, t1, t2, linked_note,th) :
 	else :
 		return False
 
-def tie_note(r_harmonic, note) : 
+def tie_note(r_harmonic, note, far_th) : 
 	'''
 	tie notes which related to same instrument.
-	Args : r_harmonic, note
+	Args : r_harmonic, note, far_th
 		r_harmonic - harmonic magnitude list.
 		note - note_set of harmonics.
+		far_th - farnote's threshold.
 	Return : link_table
 		link_table - tied notes which is related to some other note.
 			bundle of notes are other represent of instrument.
@@ -426,6 +427,25 @@ def tie_note(r_harmonic, note) :
 		nothing.
 	
 	'''
-	
+	link_table = []
+	# Below procedure will at 1 to note - 1, so need more job about 0 and note.
+	for t in range(1, len(note) - 1) :
+		link_table.append([])
+		if len(note[t]) == len(note[t+1])) :
+			if farnote(note[t-1], note[t], note[t+1], link_table[t-1], far_th) : 
+				# -1 +1 like as soon as overlaped then seperate, or finished then start.
+			else :
+				# standard state.
+				# Do Stable Mariagement with t and t+1
+		elif len(note[t]) > len(note[t+1]) : 
+			if farnote(note[t-1], note[t], note[t+1], link_table[t-1], far_th) :
+				# Overlapped.
+			else : 
+				# Instrument finished.
+		else : 
+			if farnote(note[t-1], note[t], note[t+1], link_table[t-1], far_th) : 
+				# Seperated.
+			else : 
+				# Instrument start.
 
-
+	return link_table
