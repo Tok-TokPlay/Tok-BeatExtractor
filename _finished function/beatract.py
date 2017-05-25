@@ -414,13 +414,16 @@ def tie_note(r_harmonic, note) :
 	Args : r_harmonic, note
 		r_harmonic - harmonic magnitude list.
 		note - note_set of harmonics.
-	Return : tied_note
-		tied_note - tied notes which is related to some other note.
+	Return : link_table
+		link_table - tied notes which is related to some other note.
 			bundle of notes are other represent of instrument.
+			[ at time0 [at note0 [[0,a],[0,b] ...] at note1 [[1,a],[1,b] ...]...]
+			  at time1 [at note0 [[0,a],[0,b] ...] at note1 [[1,a],[1,b] ...]...] 
+			  at time2 [at note0 [[0,a],[0,b] ...] at note1 [[1,a],[1,b] ...]...] ]
 	Raise : 
 		nothing.
 	
 	'''
-
+	
 
 
