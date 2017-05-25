@@ -351,10 +351,16 @@ def distance(time1, time2)	:
 	Raises :
 		nothing
 	'''
-	
-	
-	
-	
+	difference = []
+	# initialize return value "difference" with empty list
+	for i in range(0, len(time1)) :
+		difference.append([])
+		# add empty list to difference to show i`th time1 notes and all time2 notes.
+		for j in range(0, len(time2)) :
+			# add difference of time1[i] and time2[j]
+			# just uclidean distance of two note`s average.
+			difference[i].append(abs(mid(time1[i]) - mid(time2[j])))
+	return difference
 
 def farnote(t0, t1, t2, th) :
 	'''
