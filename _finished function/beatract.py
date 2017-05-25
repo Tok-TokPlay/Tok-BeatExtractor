@@ -341,17 +341,20 @@ def mid(note) :
 	# just return average of note`s contents.
 	return average / len(note)
 
-def distance(note1, note2)	:
+def distance(time1, time2)	:
 	'''
 	compare note1 and note2 then return some distance of 2 notes.
-	Args : note1, note2
-		note1, note2 - notes to compare
+	Args : time1, time2
+		time1, time2 - notes list of at time1 and time2
 	Return : difference
-		difference - the distance of 2 notes.
+		difference - list of all distance of mid(time1[i]) and mid(time2[j])
 	Raises :
 		nothing
 	'''
-
+	
+	
+	
+	
 
 def farnote(t0, t1, t2, th) :
 	'''
