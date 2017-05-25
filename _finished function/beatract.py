@@ -325,4 +325,57 @@ def stage_note(r_harmonics) :
 					note[t][note_number].append(f)
 	return note
 
+def mid(note) :
+	'''
+	Input note set and return average of some vector or return a remarkable values.
+	Args : note
+		note - list of vector which represent some note.
+	Returns : average
+		average - average of vector or remarkable values.
+	Raises : 
+		nothing	
+	'''
+
+
+
+def distance(note1, note2)	:
+	'''
+	compare note1 and note2 then return some distance of 2 notes.
+	Args : note1, note2
+		note1, note2 - notes to compare
+	Return : difference
+		difference - the distance of 2 notes.
+	Raises :
+		nothing
+	'''
+
+
+def farnote(t0, t1, t2, th) :
+	'''
+	compare t1 and t2 list notes and return if t1 and t2 can be linkable all notes.
+	Args : t0, t1, t2, th 
+		t0, t1, t2 - the note list which time is 0, 1, 2.
+		th - threshold. notes can be link with in range of this threshold.
+	Return : 
+		bool type. if linkalbe, return true, if not, return false.
+	Raises : 
+		nothing.
+	'''
+
+
+def tie_note(r_harmonic, note) : 
+	'''
+	tie notes which related to same instrument.
+	Args : r_harmonic, note
+		r_harmonic - harmonic magnitude list.
+		note - note_set of harmonics.
+	Return : tied_note
+		tied_note - tied notes which is related to some other note.
+			bundle of notes are other represent of instrument.
+	Raise : 
+		nothing.
+	
+	'''
+
+
 
