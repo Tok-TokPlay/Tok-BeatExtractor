@@ -362,18 +362,51 @@ def distance(time1, time2)	:
 			difference[i].append(abs(mid(time1[i]) - mid(time2[j])))
 	return difference
 
-def farnote(t0, t1, t2, th) :
+def farnote(t0, t1, t2, linked_note,th) :
 	'''
 	compare t1 and t2 list notes and return if t1 and t2 can be linkable all notes.
-	Args : t0, t1, t2, th 
+	Args : t0, t1, t2, linked_note, th
 		t0, t1, t2 - the note list which time is 0, 1, 2.
+		linked_note - list of linked note`s pair list. 
+			linked_note[i] = [i, j] mean i`th note is linked with j`th note.
 		th - threshold. notes can be link with in range of this threshold.
 	Return : 
 		bool type. if linkalbe, return true, if not, return false.
 	Raises : 
 		nothing.
 	'''
+	# difference_i_j mean distance of t_i and t_j
+	difference01 = distance(t0, t1)
+	difference12 = distance(t1, t2)
+	
+	# t1_before_length mean length of t0 and t1`s each link.
+	# to calculate this, initialize with empty list.
+	t1_before_length.append([])
+	for i in range(0, len(t1)) :
+		t1_before_length.append([])
+		# t1_before_length[i] mean link length which linked with t1[i].
+		for a in range(0, len(linked_note)) :
+			for b in range(0, len(linked_note[a])) :
+				if linked_note[a][b][1] == i :
+					# linked_note[a] mean link with t0[a]
+					# linked_note[a][b] mean b`th link with t0[a], so linked_note[a][b][1] mean t1`s note.
+					t1_before_length[i].append(difference01[linked_note[a][b][0]][i])
+					# append difference01[# of t0`s note][# of t1`s note]
+	
+	can_link = 0
+	# can_link mean # of linkable note number
+	# if all note are linkable, can_link == len(t1)
+	for i in range(0, len(t1)) :
+		for j in range(0, len(t2)) :
+			if difference12[i][j] < t1_before_length[i] + th :
+				# if t1`s i th note is close to t2`s j th notes, then linkable.
+				can_link += 1
+				break
 
+	if can_link == len(t1) :
+		return True
+	else :
+		return False
 
 def tie_note(r_harmonic, note) : 
 	'''
