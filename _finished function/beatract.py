@@ -417,9 +417,11 @@ def tie_note(r_harmonic, note) :
 	Return : link_table
 		link_table - tied notes which is related to some other note.
 			bundle of notes are other represent of instrument.
-			[ at time0 [at note0 [[0,a],[0,b] ...] at note1 [[1,a],[1,b] ...]...]
-			  at time1 [at note0 [[0,a],[0,b] ...] at note1 [[1,a],[1,b] ...]...] 
-			  at time2 [at note0 [[0,a],[0,b] ...] at note1 [[1,a],[1,b] ...]...] ]
+			[ at time0-1 [at note0 [[0,a],[0,b] ...] at note1 [[1,a],[1,b] ...] ...]
+			  at time1-2 [at note0 [[0,a],[0,b] ...] at note1 [[1,a],[1,b] ...] ...] 
+			  at time2-3 [at note0 [[0,a],[0,b] ...] at note1 [[1,a],[1,b] ...] ...]
+			  ...
+			  at timefin-1-fine[...][...]...								   ...]
 	Raise : 
 		nothing.
 	
