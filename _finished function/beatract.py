@@ -1,5 +1,33 @@
 import numpy as np
 import librosa as lb
+import os
+
+def to_wav(dir_name, save_dir, file_name) : 
+	'''
+	Change any file to wav file to calculate well.
+	Args : dir_name, save_dir, file_name
+		dir_name - src directory name which file_name is in.
+		save_dir - dest directory name which file_name.wav will be saved.
+		file_name - to change file name. file name should not contaion "." more then 1.
+	Returns :
+		nothing. save file?
+	Raises : 
+		file does not exist.
+		directory does not exist.	
+		But keep going process.
+	'''
+	# src name : dir_name + file_name + .mp3, .wmv etc...
+	# dest name : save_dir + file_name + .wav
+	src_file = dir_name + "/"  + file_name	
+	dest_file = save_dir + "/" + file_name.split(".")[0] + ".wav"
+	
+	#ffmpeg starting with full_name and wav_name
+	# do system call " ffmpeg -i 'src_file' 'dest_file' "
+	os.system('ffmpeg -i ' + '\'' + src_file + '\' ' + '\'' + dest_file + '\'')
+
+for filename in filenames :
+	# add full_name dir_name.
+	# actually full_name is full path of file name.
 
 def MCC_with_DTW(sample, dest) :
     '''
@@ -296,3 +324,5 @@ def stage_note(r_harmonics) :
 					note[t].append([])
 					note[t][note_number].append(f)
 	return note
+
+
