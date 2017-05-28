@@ -632,4 +632,12 @@ def stable_marriagement(t0, t1, t2, linked_note,th) :
 	free, i, j = is_free_note(t1, link_table, propose_queue)
 	while not free :
 		linked, _i = is_linked(j = proposed_queue[i][j], linked_table = linked_table)
+		delete_link(i, j, propose_queue)
+		if linked : 
+			#if prefer_queue[j]`s "i" index < prefer_queue`s "_i" index
+			link(i, j, propose_queue)
+		else : 
+			link(i, j, propose_queue)
+		free, i, j = is_free_note(t1, link_table, propose_queue)
 
+	return link_table
