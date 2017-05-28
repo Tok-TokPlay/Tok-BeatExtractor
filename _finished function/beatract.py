@@ -540,11 +540,34 @@ def prefer_queue(t1, t2, linked_length, difference, th) :
 	
 	return propose_queue
 	
-def is_free_note(a, link_table) : 
+def is_free_note(a, link_table, propose_queue) : 
 	'''
 	find which doesn't link note and that note is accpetable.
-	
+	make decision with ...
+		1. if a have doesn't link note
+		2.if that note`s propose_queue is empty
+		3. if any other linkable notes...
+	Args : a, link_table, propose_queue
+		a - note list which will be linked.
+		link_table - which is linked or not information.
+		propse_queue - a's propse_queue. ordered by small distance.
+	Return : can_link, i, j
+		can_link - bool type return value which exiest linkable note.
+		i - t1's index of note which doesn`t have link with t2.
+		j - t2's index of note which i`s highest priority.
+	Raise : 
+		nothing.
 	'''
+	for i in range(0, len(a)) :
+		# for all note in a...
+		if len(link_table[i]) == 0 :
+			# if a[i]`s link is null...
+			if len(propoese_queue[i]) != 0 : 
+				# if a[i]`s propese_queue[i] is not null...
+				# return from small index.
+				return True, i, propose_queue[i][0]
+	# if all index is linked or have no more propse queue, can't link.
+	return false, -1, -1
 
 def stable_marriagement(t0, t1, t2, linked_note,th) : 
 	'''
@@ -574,7 +597,6 @@ def stable_marriagement(t0, t1, t2, linked_note,th) :
 		t2 = t1
 	else : 
 		# if t1's note number is larger then t2's note number..
-
-
+	free, i, j = is_free_note(t1, link_table, propose_queue)
 
 
