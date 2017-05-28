@@ -449,3 +449,30 @@ def tie_note(r_harmonic, note, far_th) :
 				# Instrument start.
 
 	return link_table
+
+def stable_marriagement(t0, t1, t2, linked_note,th) : 
+	'''
+	link note1 and note2 with smallest value.
+	Args : t0, t1, t2, linked_note, th
+		t0, t1, t2 - before, now, after note list.
+		linked_note - linked lnformation which note is linked and which note is not linked.
+		th - adaptable value of linkinf distance.
+	Return : link_table
+		link_table - tied notes which is related to some other note.
+			bundle of notes are other represent of instrument.
+			[ at time0-1 [at note0 [[0,a],[0,b] ...] at note1 [[1,a],[1,b] ...] ...]
+			  at time1-2 [at note0 [[0,a],[0,b] ...] at note1 [[1,a],[1,b] ...] ...] 
+			  at time2-3 [at note0 [[0,a],[0,b] ...] at note1 [[1,a],[1,b] ...] ...]
+			  ...
+			  at timefin-1-fine[...][...]...								   ...]
+			Same as tie_note's returns.
+	Raise : 
+		nothing.	
+	'''
+	if len(t1) == len(t2) : 
+		# if t1's note number and t2's note number are same..
+	elif len(t1) < len(t2) : 
+		# if t1's note number is smaller then t2's note number..
+	else : 
+		# if t1's note number is larger then t2's note number..
+		
