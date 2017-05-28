@@ -25,10 +25,6 @@ def to_wav(dir_name, save_dir, file_name) :
 	# do system call " ffmpeg -i 'src_file' 'dest_file' "
 	os.system('ffmpeg -i ' + '\'' + src_file + '\' ' + '\'' + dest_file + '\'')
 
-for filename in filenames :
-	# add full_name dir_name.
-	# actually full_name is full path of file name.
-
 def MCC_with_DTW(sample, dest) :
     '''
     This function check simillarity of sound between sample and dest.
@@ -313,12 +309,12 @@ def stage_note(r_harmonics) :
 					note_number += 1					
 					# At writing some note to list, if meet 0 then stop writing and get ready to input next note.
 					# if not writing, befores are 
-			elif : 
+			else : 
 				if on_writing : 
 					# Keep writing.
 					# writing which frequency is at "note_number"`s note.
 					note[t][note_number].append(f)
-				elif : 
+				else : 
 					# if note doesn't write, then turn on write flag ( on_writing ) and append list and "f".
 					on_writing = True
 					note[t].append([])
@@ -431,9 +427,8 @@ def farnote(t0, t1, t2, linked_note,th) :
 		return True
 	else :
 		return False
-
+'''
 def tie_note(r_harmonic, note, far_th) : 
-	'''
 	tie notes which related to same instrument.
 	Args : r_harmonic, note, far_th
 		r_harmonic - harmonic magnitude list.
@@ -449,13 +444,12 @@ def tie_note(r_harmonic, note, far_th) :
 			  at timefin-1-fine[...][...]...								   ...]
 	Raise : 
 		nothing.
-	
-	'''
+
 	link_table = []
 	# Below procedure will at 1 to note - 1, so need more job about 0 and note.
 	for t in range(1, len(note) - 1) :
 		link_table.append([])
-		if len(note[t]) == len(note[t+1])) :
+		if len(note[t]) == len(note[t+1]) :
 			if farnote(note[t-1], note[t], note[t+1], link_table[t-1], far_th) : 
 				# -1 +1 like as soon as overlaped then seperate, or finished then start.
 			else :
@@ -473,7 +467,7 @@ def tie_note(r_harmonic, note, far_th) :
 				# Instrument start.
 
 	return link_table
-
+'''
 def average( _list ) : 
 	'''
 	calcuate list's average. list must be numerical.
@@ -569,7 +563,7 @@ def is_free_note(a, link_table, propose_queue) :
 	# if all index is linked or have no more propse queue, can't link.
 	return false, -1, -1
 
-def is_linked(i = -1, j = -1, linked_table) : 
+def is_linked(linked_table, i = -1, j = -1) : 
 	'''
 	check if i or j is not -1, not -1 value`s link information return.
 	linked mean does i or j is linked, and if linked, return _i which is linked index.
@@ -692,6 +686,7 @@ def stable_marriagement(t0, t1, t2, linked_note,th) :
 	'''
 	if len(t1) == len(t2) : 
 		# if t1's note number and t2's note number are same..
+		print("a")
 	elif len(t1) < len(t2) : 
 		# if t1's note number is smaller then t2's note number..
 		temp = t1
@@ -699,6 +694,8 @@ def stable_marriagement(t0, t1, t2, linked_note,th) :
 		t2 = t1
 	else : 
 		# if t1's note number is larger then t2's note number..
+		print("a")
+	
 	free, i, j = is_free_note(t1, link_table, propose_queue)
 	while not free :
 		linked, _i = is_linked(j = proposed_queue[i][j], linked_table = linked_table)
@@ -708,6 +705,7 @@ def stable_marriagement(t0, t1, t2, linked_note,th) :
 				link(i, j, propose_queue)
 		else : 
 			link(i, j, propose_queue)
+		
 		free, i, j = is_free_note(t1, link_table, propose_queue)
 
 	return link_table
