@@ -652,6 +652,25 @@ def delete_link_table(i, j, link_table) :
 			# if link_table[i] have j, then delete.
 	return link_table
 	
+def queue_index(queue, i, j) : 
+	'''
+	find j value in queue[i]
+	Args : queue, i, j
+		queue - priority queue of notes length.
+		i - index of queue.
+		j - value of queue[i] have.
+	Return : index_of_j
+		index_of_j - j in queue[i]`s index. if doesn't exist, return -1
+	Raise : 
+		nothing.
+	'''
+	for a in range(0, len(queue[i])) : 
+		if queue[i][a] == j : 
+			# if queue[i] has j, then return "index of j"
+			return a
+	# if note exist, return -1
+	return -1
+
 def stable_marriagement(t0, t1, t2, linked_note,th) : 
 	'''
 	link note1 and note2 with smallest value.
