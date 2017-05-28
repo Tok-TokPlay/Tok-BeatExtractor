@@ -64,7 +64,8 @@ def take_local_maximum(CQT_result, threshold) :
 		CQT_result : which picked up bigger then threshold.
 		threshold : standard of picking value at CQT_result.
 	Returhns : 
-		list which value is 0 when smaller then threshold value or some value when bigger then threshold value.
+		list which value is 0 when smaller then threshold value 
+			or some value when bigger then threshold value.
     Raises : 
         nothing.
     '''
@@ -87,7 +88,8 @@ def get_threshold(CQT_result, seed = 0.75, result_hop = 1000) :
 	Return the threshold number for CQT_result with differential value.
 	Args : CQT_result, seed, result_hop
 		CQT_result - the list of CQT's output.
-		seed - the seed of how far from standard value to mim / max values. default is 0.75 and this value should be real value at 0.5 ~ 1.
+		seed - the seed of how far from standard value to mim / max values. 
+			default is 0.75 and this value should be real value at 0.5 ~ 1.
 		result_hop - ignore value to take tangent of values. default is 1000
 	Returns : 
 		min / max value of threshold. threshold value.
@@ -427,6 +429,43 @@ def farnote(t0, t1, t2, linked_note,th) :
 		return True
 	else :
 		return False
+
+def coverge(t0, t1, t2, th, t, link_table, converge_table)	:
+	'''
+	Converge link notes.
+	Args : t0, t1, t2, th, t, link_table, converge_table
+		t0, t1, t2 - note set which time is n-1, n, n+1.
+		th - threshold which length acceptable.
+		t - time n.
+		link_table - linked information which is linked.
+		converge_table - converge information which is linked.
+	Return : link_table, converge_table
+		link_table - appended linked information which is linekd.
+		converge_table - appended converge information which is linked.
+	'''	
+	# Initialize difference and linked_length
+	difference = distance(t1, t2)
+	linked_length = link_length(t0, t1, linked_note)
+	
+	for i in range(0, len(t1)) : 
+		# for all t1`s notes...
+		if len(link_table[i]) != 0 :
+			# if t1`s note is not null, add to converge table.
+			converge_table[t+1][link_table[t][i][0]] += converge_table[t][i]
+		else : 
+			# if t1`s note is null, initialize it to 1.
+			converge_table[t+1][j] = 1
+			for j in range(0, len(t2)) : 
+				# then, if i`th value is acceptable to all range of t2...
+				if distance[i][j] < average(linked_length[i]) * th : 
+					# link it and add to link table and converge table.
+					link(i, j, link_table)
+					converge_table[t+1][j] += converge_table[t][i]
+	return link_table, converge_table
+
+def sperate(t0, t1, t2, th, t, converge_table) :
+	print("A")
+
 def tie_note(r_harmonic, note, far_th) : 
 	'''
 	tie notes which related to same instrument.
@@ -454,8 +493,10 @@ def tie_note(r_harmonic, note, far_th) :
 		# link is uncompleted finished, so link which not linked.
 		
 		if len(note[t]) == len(note[t+1]) :
-			# if not linked note is remain...
-		elif len(note[t]) > len(note[t+1]) :
+			if not all_linked(link_table, t) : 				
+				converge()
+				sperate()
+		elif len(note[t]) > len(note[t+1]) :	
 			# if # of note is decrease..
 			if farnote(note[t-1], note[t], note[t+1], link_table[t-1], far_th) :
 				# Overlapped. Some note need to converge.
@@ -472,6 +513,23 @@ def tie_note(r_harmonic, note, far_th) :
 				# Instrument start. Notes need not to link with before note[t-1].
 				print("A")
 	return link_table
+
+def all_linked(link_table, t) :
+	'''
+	Check link_table[t] is all linked.
+	Args : link_table, t
+		link_table - linked_information
+		t - at time t
+	Return : return_value
+		return_value - if all note is linked, return True.
+			else, return False.
+	'''
+	return_value = True
+	for a in range(0, len(link_table[t])) :
+		if len(link_table[t][a]) == 0 : 
+			# If there exist some null linked value, return false.
+			return_value = False
+	return return_value
 
 def link_notes(t0, t1, link_table) : 
 	'''
