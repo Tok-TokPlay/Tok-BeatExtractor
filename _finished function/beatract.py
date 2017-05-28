@@ -569,6 +569,38 @@ def is_free_note(a, link_table, propose_queue) :
 	# if all index is linked or have no more propse queue, can't link.
 	return false, -1, -1
 
+def is_linked(i = -1, j = -1, linked_table) : 
+	'''
+	check if i or j is not -1, not -1 value`s link information return.
+	linked mean does i or j is linked, and if linked, return _i which is linked index.
+	Args : i, j, linked_table
+		i - if not -1, check linked_table[i] have link.
+		j - if not -1, check linked_table[_i][j] have link.
+		linked_table - 
+	Return : linked, _i
+		linked - 
+		_i - 
+	Raise : 
+		nothing.
+	'''
+	if i != -1 : 
+		# if input is i...
+		if len(linked_table[i]) == 0 :
+			# if i`th table is null, then doesn`t link.
+			return False, -1
+		else :
+			# if i`th table is not null, return 1`st j value.
+			return True, linked_table[i][0]
+	elif j != -1 : 
+		for a in range(0, len(linked_table)) :
+			for b in range(0, len(linked_table[a])) :
+				# at a`th linked_table, if a`th linked_table has value...
+				if j == linked_table[a][b] : 
+					# and that value is j, return
+					return True, a
+		return False, -1
+
+
 def stable_marriagement(t0, t1, t2, linked_note,th) : 
 	'''
 	link note1 and note2 with smallest value.
@@ -598,5 +630,6 @@ def stable_marriagement(t0, t1, t2, linked_note,th) :
 	else : 
 		# if t1's note number is larger then t2's note number..
 	free, i, j = is_free_note(t1, link_table, propose_queue)
-
+	while not free :
+		linked, _i = is_linked(j = proposed_queue[i][j], linked_table = linked_table)
 
