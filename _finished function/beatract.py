@@ -600,7 +600,58 @@ def is_linked(i = -1, j = -1, linked_table) :
 					return True, a
 		return False, -1
 
-
+def delete_queue(i, j, propose_queue) :
+	'''
+	delete propose_queue[i]`s j value.
+	Args : i, j, propose_queue
+		i - which will deleted number of index in queue.
+		j - which will deleted number of notes in queue[i].
+		propose_queue - deleted_queue
+	Return : propse_queue
+		propse_queue - deleted queue
+	Raise : 
+		nothing.
+	'''
+	for a in range(0, len(propose_queue[i])) : 
+		if propose_queue[i][a] == j : 
+			del(propose_queue[i][a])
+			# if propose_queue[i][a] is same as j, then delete j.
+	return propose_queue
+	
+def link(i, j, link_table) :
+	'''
+	link i`th note of t1 and j`th note of t2 at link_table.
+	Args : i, j, link_table
+		i - i`th note of t1
+		j - j`th note of t2
+		link_table - link information of notes.
+	Return : link_table
+		link_table - append link notes list information.
+	Raise : 
+		nothing.
+	'''
+	link_table[i].append(j)
+	# link at link_table
+	return link_table
+	
+def delete_link_table(i, j, link_table) : 
+	'''
+	delete i`th notes j value in link_table.
+	Args : i, j, link_table
+		i - i`th note of t1
+		j - j value in t2
+		link_table - link information of notes.
+	Return : 
+		link_table - appended link notes list information.
+	Raise : 
+		nothing.
+	'''
+	for b in range(0, len(link_table[i])) : 
+		if link_table[i][b] == j : 
+			del(link_table[i][b])
+			# if link_table[i] have j, then delete.
+	return link_table
+	
 def stable_marriagement(t0, t1, t2, linked_note,th) : 
 	'''
 	link note1 and note2 with smallest value.
@@ -632,10 +683,10 @@ def stable_marriagement(t0, t1, t2, linked_note,th) :
 	free, i, j = is_free_note(t1, link_table, propose_queue)
 	while not free :
 		linked, _i = is_linked(j = proposed_queue[i][j], linked_table = linked_table)
-		delete_link(i, j, propose_queue)
+		propose_queue = delete_queue(i, j, propose_queue)
 		if linked : 
 			#if prefer_queue[j]`s "i" index < prefer_queue`s "_i" index
-			link(i, j, propose_queue)
+				link(i, j, propose_queue)
 		else : 
 			link(i, j, propose_queue)
 		free, i, j = is_free_note(t1, link_table, propose_queue)
