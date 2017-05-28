@@ -446,10 +446,11 @@ def tie_note(r_harmonic, note, far_th) :
 		nothing.
 	'''
 	link_table = []
+	link_notes(note[0], note[1], link_table)
 	# Below procedure will at 1 to note - 1, so need more job about 0 and note.
 	for t in range(1, len(note) - 1) :
 		link_table.append([])
-		stable_marriagement(note[t-1], note[t], note[t+1],link_table[t-1], th)
+		stable_marriagement(note[t-1], note[t], note[t+1], link_table[t-1], th)
 		# link is uncompleted finished, so link which not linked.
 		
 		if len(note[t]) == len(note[t+1]) :
@@ -462,14 +463,66 @@ def tie_note(r_harmonic, note, far_th) :
 			else : 
 				# Instrument finished. Notes need not to link with note[t+1].
 				print("A")
-		else : 
+		else :
+			# if # of note is increase.. 
 			if farnote(note[t-1], note[t], note[t+1], link_table[t-1], far_th) : 
 				# Seperated. Some note need to seperate.
 				print("A")
 			else : 
 				# Instrument start. Notes need not to link with before note[t-1].
 				print("A")
+	return link_table
 
+def link_notes(t0, t1, link_table) : 
+	'''
+	link t0, t1 with only distacne. At this moment, ignore far.
+	Args : t0, t1, link_table
+		t0, t1 - notes which will be linked.
+		link_table - linked information which is linked.
+	Return : link_table
+		link_table - appended link_table`s link information.
+	Raise : 
+		nothing.
+	'''
+	# initialize linked length 
+	linked_length = []
+
+	# difference_i_j mean distance of t_i and t_j
+	difference = distance(t0, t1)
+	linked_length = []
+	
+	for a in range(0, len(t0)) :
+		linked_length.append([])
+		linked_length[a].append(100000)
+		# 100000 is as big value which can cover all distance.
+	
+	# Initialize propse_queue, prefer_queue	
+	difference = distance(t0, t1)
+	
+	propose_queue = prefer_queue(t1, t2, linked_length, difference, th)
+	prefer_queue = prefer_queue(t2, t1, linked_length, difference, th)
+	
+	free, i, j = is_free_note(t1, link_table, propose_queue)
+	# free - does t1 can link to t2.
+	# In word, t1 has free note and that note have not null propose_queue, return free note index i and 
+	# i`th first value j.
+	
+	while not free :
+		# if linkable...
+		linked, _i = is_linked(j = proposed_queue[i][j], linked_table = link_table)
+		propose_queue = delete_queue(i, j, propose_queue)
+		# check if linkable j is free and delete i, j pair in propose queue.
+		if linked : 
+			if queue_index(prefer_queue, j, i) < queue_index(prefer_queue, j, _i) :
+				# if linkable and j`th i  prefer index is smaller then j`th _i prefer index, delete _i and link i.
+				# _i is linked value with j.
+				delete_link_table(_i, j, link_table)
+				link(i, j, link_table)
+		else : 
+			# if linkable j is free, link it.
+			link(i, j, link_table)
+		# initialize free and i, j.
+		free, i, j = is_free_note(t1, link_table, propose_queue)
 	return link_table
 
 def average( _list ) : 
