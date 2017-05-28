@@ -474,6 +474,78 @@ def tie_note(r_harmonic, note, far_th) :
 
 	return link_table
 
+def average( _list ) : 
+	'''
+	calcuate list's average. list must be numerical.
+	Args : _list
+		_list - numeric value's list or one value.
+	Return : mean
+		mean - average of list.
+	Raise :
+		nothing.
+	'''
+	if(type(_list) == type([])) :
+	# if input is list. 
+		summed = 0
+		# initialize summed.
+		for i in range(0, len(_list)) : 
+			summed += _list[i]
+			# Calculated all sum of _list
+		return summend/len(_list)	
+	else : 
+	# if input is not list
+		return _list
+
+def prefer_queue(t1, t2, linked_length, difference, th) : 
+	'''
+	make queue which will using at stable marriagement argorithms.
+	Args : t1, t2, linked_length, difference
+		t1, t2 - note list. t1 is standard note, so t1's prefer list about t2.
+		linked_length - t0 and t1's linekd length. will be using calculate acceptance.
+		difference - t1 and t2's length table. will be using calculate acceptance.
+		th - acceptance of value of length.
+	Return : propse_queue
+		propose_queue - ordered queue having priority from t1 to t2.
+	Raise : 
+		nothing.
+	'''
+	# initialize queue and info list.
+	propose_queue = []
+	length_info = []
+	for a in range(0, len(t1)) :
+		propose_queue.append([])
+		length_info.append([])
+		# add [] size of t1's length.
+		# ordered by t1.
+		for b in range(0, len(t2)) : 
+			if average(linked_length[a]) * th > difference[a][b] : 
+				# if a and b's length is acceptable, append to queue.
+				propose_queue[a].append(b)
+				length_info[a].append(difference[a][b])
+	# sorting propse_queue with length_info.
+	for i in range(0, len(propose_queue)) :
+		for a in range(0, len(propose_queue[i]) - 1) :
+			for b in range(a+1, len(propose_queue[i])) :
+				# At propose_queue[i], sort list propose_queue[i] with order of length_info, increase. 
+				if length_info[i][a] > length_info[i][b] :
+					# Swap length_info 
+					temp = length_info[i][a]
+					length_info[i][a] = lenth_info[i][b]
+					length_info[i][b] = temp
+						
+					# Swap propose_queue
+					temp = propose_queue[i][a]
+					propose_queue[i][a] = propose_queue[i][b]
+					propose_queue[i][b] = temp
+	
+	return propose_queue
+	
+def is_free_note(a, link_table) : 
+	'''
+	find which doesn't link note and that note is accpetable.
+	
+	'''
+
 def stable_marriagement(t0, t1, t2, linked_note,th) : 
 	'''
 	link note1 and note2 with smallest value.
