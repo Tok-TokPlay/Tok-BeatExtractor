@@ -449,27 +449,25 @@ def tie_note(r_harmonic, note, far_th) :
 	# Below procedure will at 1 to note - 1, so need more job about 0 and note.
 	for t in range(1, len(note) - 1) :
 		link_table.append([])
+		stable_marriagement(note[t-1], note[t], note[t+1],link_table[t-1], th)
+		# link is uncompleted finished, so link which not linked.
+		
 		if len(note[t]) == len(note[t+1]) :
-			if farnote(note[t-1], note[t], note[t+1], link_table[t-1], far_th) : 
-				# -1 +1 like as soon as overlaped then seperate, or finished then start.
-				print("A")
-			else :
-				# standard state.
-				# Do Stable Mariagement with t and t+1
-				print("A")
-		elif len(note[t]) > len(note[t+1]) : 
+			# if not linked note is remain...
+		elif len(note[t]) > len(note[t+1]) :
+			# if # of note is decrease..
 			if farnote(note[t-1], note[t], note[t+1], link_table[t-1], far_th) :
-				# Overlapped.
+				# Overlapped. Some note need to converge.
 				print("A")
 			else : 
-				# Instrument finished.
+				# Instrument finished. Notes need not to link with note[t+1].
 				print("A")
 		else : 
 			if farnote(note[t-1], note[t], note[t+1], link_table[t-1], far_th) : 
-				# Seperated.
+				# Seperated. Some note need to seperate.
 				print("A")
 			else : 
-				# Instrument start.
+				# Instrument start. Notes need not to link with before note[t-1].
 				print("A")
 
 	return link_table
