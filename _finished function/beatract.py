@@ -292,8 +292,8 @@ def stage_note(r_harmonics) :
 	stage notes to make decision which notes are same instrumental.
 	Args : r_harmonics
 		r_harmonics - real harmonics value map with 0 which is smaller then threshold.
-	Returns : note_map
-		note_map - for all time sequence, clustering all notes to list.
+	Returns : note
+		note - for all time sequence, clustering all notes to list.
 	Raises : 
 		nothing
 	'''
