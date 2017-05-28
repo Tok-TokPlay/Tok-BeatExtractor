@@ -362,9 +362,46 @@ def distance(time1, time2)	:
 			difference[i].append(abs(mid(time1[i]) - mid(time2[j])))
 	return difference
 
+def link_length(t0, t1, linked_note) : 
+	'''
+	linked_length information about t0 and t1 with link table "linked_note"
+	Args : t0, t1, linked_note	
+		t0, t1 - note set which want to know about linked length. 
+			For specific, t1's order of length.
+		linked_note - linke information table of t0 and t1.
+	Return : linked_length
+		linked_length - link information of t0 and t1.
+			This list is sorted by t1, for example...
+			linke_length = [ [10, 8], [4], [2, 3] ] means
+				t1[0]'s linked_length is 10 and 8,
+				t1[1]'s linked_length is 4 ... etc.
+	Raises : 
+		nothing.
+	'''
+	# initialize linked length 
+	linked_length = []
+
+	# difference_i_j mean distance of t_i and t_j
+	difference = distance(t0, t1)
+	
+	for i in range(0, len(t1)) :
+		linked_length.append([])
+		# linked_length[i] mean link length which linked with t1[i].
+		for a in range(0, len(linked_note)) :
+			for b in range(0, len(linked_note[a])) :
+				if linked_note[a][b][1] == i :
+					# linked_note[a] mean link with t0[a]
+					# linked_note[a][b] mean b`th link with t0[a], so linked_note[a][b][1] mean t1`s note.
+					linked_length[i].append(difference[linked_note[a][b][0]][i])
+					# append difference01[# of t0`s note][# of t1`s note]
+
+	return linked_length
+	
+	
 def farnote(t0, t1, t2, linked_note,th) :
 	'''
 	compare t1 and t2 list notes and return if t1 and t2 can be linkable all notes.
+	this function is abstract check of far information.
 	Args : t0, t1, t2, linked_note, th
 		t0, t1, t2 - the note list which time is 0, 1, 2.
 		linked_note - list of linked note`s pair list. 
@@ -376,29 +413,16 @@ def farnote(t0, t1, t2, linked_note,th) :
 		nothing.
 	'''
 	# difference_i_j mean distance of t_i and t_j
-	difference01 = distance(t0, t1)
-	difference12 = distance(t1, t2)
-	
-	# t1_before_length mean length of t0 and t1`s each link.
-	# to calculate this, initialize with empty list.
-	t1_before_length.append([])
-	for i in range(0, len(t1)) :
-		t1_before_length.append([])
-		# t1_before_length[i] mean link length which linked with t1[i].
-		for a in range(0, len(linked_note)) :
-			for b in range(0, len(linked_note[a])) :
-				if linked_note[a][b][1] == i :
-					# linked_note[a] mean link with t0[a]
-					# linked_note[a][b] mean b`th link with t0[a], so linked_note[a][b][1] mean t1`s note.
-					t1_before_length[i].append(difference01[linked_note[a][b][0]][i])
-					# append difference01[# of t0`s note][# of t1`s note]
+	difference = distance(t1, t2)
+		
+	t1_before_length = link_length(t0, t1, linked_note)
 	
 	can_link = 0
 	# can_link mean # of linkable note number
 	# if all note are linkable, can_link == len(t1)
 	for i in range(0, len(t1)) :
 		for j in range(0, len(t2)) :
-			if difference12[i][j] < t1_before_length[i] + th :
+			if difference[i][j] < t1_before_length[i] + th :
 				# if t1`s i th note is close to t2`s j th notes, then linkable.
 				can_link += 1
 				break
@@ -473,6 +497,12 @@ def stable_marriagement(t0, t1, t2, linked_note,th) :
 		# if t1's note number and t2's note number are same..
 	elif len(t1) < len(t2) : 
 		# if t1's note number is smaller then t2's note number..
+		temp = t1
+		t1 = t2
+		t2 = t1
 	else : 
 		# if t1's note number is larger then t2's note number..
-		
+
+
+
+
