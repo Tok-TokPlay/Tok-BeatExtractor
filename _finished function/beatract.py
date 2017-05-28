@@ -299,16 +299,16 @@ def stage_note(r_harmonics) :
 	'''
 	note = []
 	# Initialize note list.
-	for t in range(0, len(r_harmonics)) :
+	for t in range(0, len(r_harmonics[0])) :
 		note.append([])
 		note_number = 0
 		on_writng = False
 		# Initialize note[] list and set on_writing to false, because start must be start with not writing.
-		for f in range(0, len(r_harmonics[0])) :
+		for f in range(0, len(r_harmonics)) :
 			if harmonic[f][t] == 0 : 
 				if on_writing :
 					on_writing = False
-					note_number += 1					
+					note_number += 1				
 					# At writing some note to list, if meet 0 then stop writing and get ready to input next note.
 					# if not writing, befores are 
 			else : 
