@@ -427,8 +427,8 @@ def farnote(t0, t1, t2, linked_note,th) :
 		return True
 	else :
 		return False
-'''
 def tie_note(r_harmonic, note, far_th) : 
+	'''
 	tie notes which related to same instrument.
 	Args : r_harmonic, note, far_th
 		r_harmonic - harmonic magnitude list.
@@ -444,7 +444,7 @@ def tie_note(r_harmonic, note, far_th) :
 			  at timefin-1-fine[...][...]...								   ...]
 	Raise : 
 		nothing.
-
+	'''
 	link_table = []
 	# Below procedure will at 1 to note - 1, so need more job about 0 and note.
 	for t in range(1, len(note) - 1) :
@@ -452,22 +452,28 @@ def tie_note(r_harmonic, note, far_th) :
 		if len(note[t]) == len(note[t+1]) :
 			if farnote(note[t-1], note[t], note[t+1], link_table[t-1], far_th) : 
 				# -1 +1 like as soon as overlaped then seperate, or finished then start.
+				print("A")
 			else :
 				# standard state.
 				# Do Stable Mariagement with t and t+1
+				print("A")
 		elif len(note[t]) > len(note[t+1]) : 
 			if farnote(note[t-1], note[t], note[t+1], link_table[t-1], far_th) :
 				# Overlapped.
+				print("A")
 			else : 
 				# Instrument finished.
+				print("A")
 		else : 
 			if farnote(note[t-1], note[t], note[t+1], link_table[t-1], far_th) : 
 				# Seperated.
+				print("A")
 			else : 
 				# Instrument start.
+				print("A")
 
 	return link_table
-'''
+
 def average( _list ) : 
 	'''
 	calcuate list's average. list must be numerical.
@@ -684,28 +690,36 @@ def stable_marriagement(t0, t1, t2, linked_note,th) :
 	Raise : 
 		nothing.	
 	'''
-	if len(t1) == len(t2) : 
-		# if t1's note number and t2's note number are same..
-		print("a")
-	elif len(t1) < len(t2) : 
-		# if t1's note number is smaller then t2's note number..
-		temp = t1
-		t1 = t2
-		t2 = t1
-	else : 
-		# if t1's note number is larger then t2's note number..
-		print("a")
+	# Initialize link_table	
+	link_table = []
+	for a in range(0, len(t1)) : 
+		link_table.append([])
+	
+	# Initialize propse_queue, prefer_queue	
+	linked_length = link_length(t0, t1, linked_note)
+	difference = distance(time1, time2)
+	
+	propose_queue = prefer_queue(t1, t2, linked_length, difference, th)
+	prefer_queue = prefer_queue(t2, t1, linked_length, difference, th)
 	
 	free, i, j = is_free_note(t1, link_table, propose_queue)
+	# free - does t1 can link to t2.
+	# In word, t1 has free note and that note have not null propose_queue, return free note index i and 
+	# i`th first value j.
 	while not free :
-		linked, _i = is_linked(j = proposed_queue[i][j], linked_table = linked_table)
+		# if linkable...
+		linked, _i = is_linked(j = proposed_queue[i][j], linked_table = link_table)
 		propose_queue = delete_queue(i, j, propose_queue)
+		# check if linkable j is free and delete i, j pair in propose queue.
 		if linked : 
-			#if prefer_queue[j]`s "i" index < prefer_queue`s "_i" index
-				link(i, j, propose_queue)
+			if queue_index(prefer_queue, j, i) < queue_index(prefer_queue, j, _i) :
+				# if linkable and j`th i  prefer index is smaller then j`th _i prefer index, delete _i and link i.
+				# _i is linked value with j.
+				delete_link_table(_i, j, link_table)
+				link(i, j, link_table)
 		else : 
-			link(i, j, propose_queue)
-		
+			# if linkable j is free, link it.
+			link(i, j, link_table)
+		# initialize free and i, j.
 		free, i, j = is_free_note(t1, link_table, propose_queue)
-
 	return link_table
