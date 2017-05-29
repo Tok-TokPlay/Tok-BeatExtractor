@@ -53,8 +53,7 @@ def tie_note(note, threshold):
     append_list(note, link_table, note_list, icoef_table, length_table, 0)
     for time in range(1, len(note)-1):
 		# Stable marriagement -> link notes 1 : 1
-        stable_marriagement(note[time], note[time+1], link_table, note_list, \
-		icoef_table, length_table, time, threshold)
+        stable_marriagement(note[time], note[time+1], link_table, length_table, time, threshold)
 		# Converge -> link notes n : 1
         coverage(note[time], note[time+1], link_table, note_list, icoef_table,\
 		length_table, time, threshold)
@@ -65,7 +64,32 @@ def tie_note(note, threshold):
         append_list(note, link_table, note_list, icoef_table, length_table, time)
     return link_table, note_list, icoef_table, length_table
 
-def stable_marriagement(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time,th):
+def stable_marriagement(note_t1, note_t2, link_table, length_table, time, threshold):
+    '''
+	link note1 and note2 with smallest value and length_table with threshold.
+	Args: note, link_table, note_list, icoef_table, length_table, time, threshold
+		note_t1 - time1`s note. [[1, 2, 3, 4], [10, 11, 12, 13, 14, ...] ... [210, 211, 212, 213]]
+		note_t2 - time2`s note. [[1, 2, 3, 4], [10, 11, 12, 13, 14, ...] ... [210, 211, 212, 213]]
+        link_table - tied notes which is related to some other note.
+            bundle of notes are other represent of instrument.
+            [ at time 0[[0], [0], [0], ... , [0], [1], [0]],
+              at time 1[[1], [1, 2], [1], ... , [1], [1, 2], [2]],
+              at time 2[[2], [1, 2], [2], ... , [2], [1, 2], [2]],
+              ...
+              at time t[[t], [t], [t], ... , [t], [t-1, t], [t]] ]
+        length_table - plused or minused length of note`s location.
+            [ coef 0 [4, -2, -1, ... 1, 3, 3],
+              coef 1 [-1, -2, -1, ... 2, 3, 1],
+              coef 2 [4, 4, 3, ... 2, -3, 1],
+              ...
+              coef t [2, 1, 0, ... 1, -2, -1] ]
+		time - now processing time.
+		threshold - threshold to acceptance of distance.
+	Return:
+	    Add to link_table
+	Raise:
+	    nothing
+	'''
     print("A")
 
 def coverage(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time,th): 
@@ -111,6 +135,7 @@ def append_list(note, link_table, note_list, icoef_table, length_table, time):
               ...
               coef t [2, 1, 0, ... 1, -2, -1] ]
 	Return:
+	    nothing
 	Raise:
 	    nothing
 	'''
