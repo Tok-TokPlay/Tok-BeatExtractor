@@ -8,6 +8,10 @@ def tie_note(note, threshold):
     Args: r_harmonic, note, far_th
         r_harmonic - harmonic magnitude list.
         note - note_set of harmonics.
+            [ at time 0 [1, 2, 3, 4], [6, 7, 8, 9], ... [211, 212, 213, 214, 215],
+              at time 1 [2, 3, 4, 5, 6 ,7, 8], [10, 11, 12] ... [212, 213, 214, 215],
+              ...
+              at time n [2, 3 , 4, 5], [8, 9, 10, 11], ... [211, 212, 213, 214] ]
         far_th - farnote's threshold.
     Return: link_table, note_list, icoef_table, length_table
         link_table - tied notes which is related to some other note.
@@ -90,7 +94,81 @@ def stable_marriagement(note_t1, note_t2, link_table, length_table, time, thresh
 	Raise:
 	    nothing
 	'''
-    print("A")
+    difference = distance(note_t1, note_t2)
+    propose_queue = make_queue(note_t1, note_t2, length_table, difference, threshold)
+    prefer_queue = make_queue(note_t1, note_t2, length_table, difference, threshold)
+
+    free, i, j = is_free_note(propose_queue, link_table)
+
+    while not free:
+        linked, linked_i = is_linked(j = propose_queue[i][j], link_table)
+        delete_relation(propse_queue, i, j)
+        if linked:
+            if priority(prefer_queue, j, i) > priority(prefer_queue, j, linked_i):
+                delete_link(link_table, linked_i, j)
+                make_link(link_table, i, j)
+        else:
+            make_link(link_table, i, j)
+        free, i, j = is_free_note(propose_queue, link_table)
+def make_queue(note_t1, note_t2, length_table, difference, threshold):
+    '''
+    make propose queue ( prefer list ) for note_t1 to note_t2.
+    Args:
+    Return: prefer_list
+        prefer_list -
+    Raise:
+        nothing
+    '''
+    prefer_list = []
+    return prefer_list
+
+def is_free_note(propose_queue, link_table):
+    '''
+
+    Args:
+    Return:
+    Raise:
+    '''
+
+def is_linked(i = -1, j = -1, link_table):
+    '''
+
+    Args:
+    Return:
+    Raise:
+    '''
+
+def delete_relation(propose_queue, i, j):
+    '''
+
+    Args:
+    Return:
+    Raise:
+    '''
+
+def priority(prefer_queue, i, j):
+    '''
+
+    Args:
+    Return:
+    Raise:
+    '''
+
+def delete_link(link_table, i, j):
+    '''
+
+    Args:
+    Return:
+    Raise:
+    '''
+
+def make_link(link_table, i, j):
+    '''
+
+    Args:
+    Return:
+    Raise:
+    '''
 
 def coverage(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold):
     print("A")
