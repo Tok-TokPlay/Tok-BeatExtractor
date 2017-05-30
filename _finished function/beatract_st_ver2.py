@@ -108,11 +108,12 @@ def stable_marriagement(note_t1, note_t2, link_table, length_table, time, thresh
         delete_relation(propose_queue, i, j)
         if linked:
             if priority(prefer_queue, j, i) > priority(prefer_queue, j, linked_i):
-                delete_link(link_table, linked_i, j)
-                make_link(link_table, i, j)
+                delete_link(link_table, time, linked_i, j)
+                make_link(link_table, time, i, j)
         else:
-            make_link(link_table, i, j)
+            make_link(link_table, time, i, j)
         free, i, j = is_free_note(propose_queue, link_table)
+
 def make_queue(note_t1, note_t2, length_table, difference, threshold, time):
     '''
     make propose queue ( prefer list ) for note_t1 to note_t2.
@@ -223,6 +224,11 @@ def delete_relation(propose_queue, i, j):
     Raise:
         nothing.
     '''
+    # For all range in propose_queue[i]...
+    for delete_number in range(0, len(propose_queue[i])):
+        if propose_queue[i][delete_number] == j:
+            del propose_queue[i][delete_number]
+            break
 
 def priority(prefer_queue, i, j):
     '''
@@ -234,18 +240,37 @@ def priority(prefer_queue, i, j):
     Raise:
         nothing.
     '''
+    # For all range in prefer_queue[i]...
+    for prior in range(0, len(prefer_queue[i])):
+        if prefer_queue[i][prior] == j:
+            # length - prior is priority.
+            return len(prefer_queue[i]) - prior
 
-def delete_link(link_table, i, j):
+def delete_link(link_table, time, i, j):
     '''
     delete link at link_table[i]`s linked value "j"
     Args: link_table, i, j
+        link_table - tied notes which is related to some other note.
+            bundle of notes are other represent of instrument.
+            [ at time 0[[0], [0], [0], ... , [0], [1], [0]],
+              at time 1[[1], [1, 2], [1], ... , [1], [1, 2], [2]],
+              at time 2[[2], [1, 2], [2], ... , [2], [1, 2], [2]],
+              ...
+              at time t[[t], [t], [t], ... , [t], [t-1, t], [t]] ]
+        i - time "time"`s index.
+        j - time "time+"`s note index value.
     Return:
         nothing.
     Raise:
         nothing.
     '''
+    # for all value in link_table.
+    for delete_number in range(0, len(link_table[time][i])):
+        if link_table[time][i][delete_number] == j:
+            # delete which value is j in i th note`s link.
+            del link_table[time][i][delete_number]
 
-def make_link(link_table, i, j):
+def make_link(link_table, time, i, j):
     '''
     make link at link_table[i]`s link value "j"
     Args: link_table, i, j
@@ -254,7 +279,9 @@ def make_link(link_table, i, j):
     Raise:
         nothing.
     '''
-
+    # Make link with at time "time", i`th notes to j.
+    link_table[time][i].append(j)
+    
 def coverage(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold):
     '''
     converge which is not linked and have acceptable link notes.
@@ -272,7 +299,7 @@ def coverage(note_t1, note_t2, link_table, note_list, icoef_table, length_table,
                 acceptable = acceptable_note(difference, note_number1,\
                 note_number2, time, threshold)
                 if acceptable:
-                    make_link(link_table, note_number1, note_number2)
+                    make_link(link_table, time, note_number1, note_number2)
                     break
 
 def acceptable_note(difference, i, j, time, threshold):
