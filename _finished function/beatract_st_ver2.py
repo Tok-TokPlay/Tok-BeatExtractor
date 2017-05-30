@@ -62,7 +62,7 @@ def tie_note(note, threshold):
 		# Converge -> link notes n : 1
         coverage(note[time], note[time+1], link_table, length_table, time, threshold)
 		# Seperate -> link notes 1 : n
-        seperate(note[time], note[time+1], link_table, note_list, icoef_table,\
+        seperate(note[time], note[time+1], link_table, icoef_table,\
 		length_table, time, threshold)
 		# renew 4 tables
         append_list(note, link_table, note_list, icoef_table, length_table, time)
@@ -334,7 +334,7 @@ def acceptable_note(length_table, difference, i, j, time, threshold):
     else:
         return False
 
-def seperate(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold):
+def seperate(note_t1, note_t2, link_table, icoef_table, length_table, time, threshold):
     '''
     Seperate if coef is lareger then 2 and have acceptable_note in range of length.
     Args: note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold
@@ -621,7 +621,7 @@ def distance(time1, time2):
             difference[i].append(abs(mid(time1[i]) - mid(time2[j])))
     return difference
 
-def beatract(r_harmonics, note, link_table, note_list, icoef_table):
+def beatract(r_harmonics, note, note_list, icoef_table):
     '''
     Extract beat with some weights.
     Periodic instrument( note link ) will have low weights.
@@ -673,8 +673,7 @@ def get_periodic(note_t1):
             empty_number += 1
     # empty_number / len(note_t1) is portion score.
 
-
-
+    return empty_number / len(note_t1)
 
 def get_weights(r_harmonics, note, note_value, icoef_value, sequence):
     '''
