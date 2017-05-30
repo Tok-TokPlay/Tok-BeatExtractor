@@ -92,10 +92,10 @@ def stable_marriagement(note_t1, note_t2, link_table, length_table, time, thresh
 	'''
     print("A")
 
-def coverage(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time,th): 
+def coverage(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold):
     print("A")
 
-def seperate(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time,th):
+def seperate(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold):
     print("A")
 
 def append_list(note, link_table, note_list, icoef_table, length_table, time):
@@ -227,3 +227,15 @@ def distance(time1, time2):
             # just uclidean distance of two note`s average.
             difference[i].append(abs(mid(time1[i]) - mid(time2[j])))
     return difference
+
+def beatract(r_harmonics, note, link_table, note_list, icoef_table):
+    '''
+    Extract beat with some weights.
+    Periodic instrument( note link ) will have low weights.
+    Large sound will have high weights.
+    Args: r_harmonics, note, link_table, note_list, icoef_table
+    Return: beat_weights
+    Raise:
+         nothing
+    '''
+    print("a")
