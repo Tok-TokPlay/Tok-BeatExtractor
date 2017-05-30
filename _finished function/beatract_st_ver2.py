@@ -357,4 +357,38 @@ def beatract(r_harmonics, note, link_table, note_list, icoef_table):
     Raise:
          nothing
     '''
-    print("a")
+    periodic = []
+    for note_number in range(0, len(note_list)):
+        periodic.append(get_periodic(note_list[note_number]))
+
+    weights = []
+    for note_number in range(0, len(note_list)):
+        weights.append([])
+        for sequence in range(0, len(note_list[note_number])):
+            weights[note_number].append([get_weights(note, note_list[note_number][sequence], \
+            icoef_table[note_number][sequence])])
+    real_beat = []
+    for note_number2 in range(0, len(weights[0])):
+        _sum = 0
+        for note_number1 in range(0, len(weights)):
+            _sum += weights[note_number1][note_number2]
+        real_beat.append(_sum)
+    return real_beat
+
+def get_periodic(note_t1):
+    '''
+
+    Args:
+    Return:
+    Raise:
+        nothing.
+    '''
+
+def get_weights(note, note_value, icoef_value):
+   '''
+
+    Args:
+    Return:
+    Raise:
+        nothing.
+   '''
