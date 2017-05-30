@@ -54,7 +54,7 @@ def tie_note(note, threshold):
         note_list[notes].append(notes)
 
     # link note[0] and note[1] with stable_marriagement
-    append_list(note, link_table, note_list, icoef_table, length_table, 0)
+    append_list(note, link_table, note_list, icoef_table, length_table)
     for time in range(1, len(note)-1):
 		# Stable marriagement -> link notes 1 : 1
         stable_marriagement(note[time], note[time+1], link_table, length_table, time, threshold)
@@ -65,7 +65,7 @@ def tie_note(note, threshold):
         seperate(note[time], note[time+1], link_table, note_list, icoef_table,\
 		length_table, time, threshold)
 		# renew 4 tables
-        append_list(note, link_table, note_list, icoef_table, length_table, time)
+        append_list(note, link_table, note_list, icoef_table, length_table)
     return link_table, note_list, icoef_table, length_table
 
 def stable_marriagement(note_t1, note_t2, link_table, length_table, time, threshold):
@@ -103,7 +103,7 @@ def stable_marriagement(note_t1, note_t2, link_table, length_table, time, thresh
     free, i, j = is_free_note(propose_queue, link_table)
 
     while not free:
-        linked, linked_i = is_linked(link_table, j = propose_queue[i][j])
+        linked, linked_i = is_linked(link_table, j=propose_queue[i][j])
         delete_relation(propose_queue, i, j)
         if linked:
             if priority(prefer_queue, j, i) > priority(prefer_queue, j, linked_i):
@@ -126,60 +126,77 @@ def make_queue(note_t1, note_t2, length_table, difference, threshold):
 
 def is_free_note(propose_queue, link_table):
     '''
-
-    Args:
-    Return:
+    Calculate is ther free note in link_table which is at propose_queue.
+    Args: propose_queue, link_table
+    Return: Bool, i, j
     Raise:
+        nothing.
     '''
     return False, -1, -1
 
 def is_linked(link_table, i=-1, j=-1):
     '''
-
+    Check if given i or j is linked in link_table, and return which is linked.
     Args: i, j, link_table
     Return: linked, linked_i
         linked - if given i or j are linked with some notes, return True, else return False.
         linked_i - if linked == True, return linked note`s list "note"`s index.( value )
             else, return -1
     Raise:
+        nothing.
     '''
 
     return False, -1
 
 def delete_relation(propose_queue, i, j):
     '''
-
-    Args:
+    delete relation at propose_queue[i] which is linked with value "j"
+    Args: propose_queue, i, j
     Return:
+        nothing.
     Raise:
+        nothing.
     '''
 
 def priority(prefer_queue, i, j):
     '''
-
-    Args:
-    Return:
+    return j th priority at prefer_queue[i].
+    Args: prefer_queue, i, j
+    Return: priority
+        priority - value which is MAX - index.
+            if prioirity is large, index is small.
     Raise:
+        nothing.
     '''
 
 def delete_link(link_table, i, j):
     '''
-
-    Args:
+    delete link at link_table[i]`s linked value "j"
+    Args: link_table, i, j
     Return:
+        nothing.
     Raise:
+        nothing.
     '''
 
 def make_link(link_table, i, j):
     '''
-
-    Args:
+    make link at link_table[i]`s link value "j"
+    Args: link_table, i, j
     Return:
+        nothing.
     Raise:
+        nothing.
     '''
 
 def coverage(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold):
     '''
+    converge which is not linked and have acceptable link notes.
+    Args: note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold
+    Return:
+        nothing.
+    Raise:
+        nothing.
     '''
     difference = distance(note_t1, note_t2)
     for note_number1 in range(0, len(note_t1)):
@@ -194,11 +211,23 @@ def coverage(note_t1, note_t2, link_table, note_list, icoef_table, length_table,
 
 def acceptable_note(difference, i, j, time, threshold):
     '''
+    Check acceptablility with difference[i][j] + threshold is in length acceptable at time.
+    Args: difference, i, j, time, threshold
+    Return: bool
+        bool - if acceptable, return True, else return False.
+    Raise:
+        nothing.
     '''
     return False
 
 def seperate(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold):
     '''
+    Seperate if coef is lareger then 2 and have acceptable_note in range of length.
+    Args: note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold
+    Return:
+        nothing.
+    Raise:
+        nothing.
     '''
     difference = distance(note_t1, note_t2)
     for n1 in range(0, len(note_t1)):
@@ -214,6 +243,11 @@ def calc_icoef(icoef_table, note_list, n1):
     '''
     calculate icoef with time0 to time1`s note_list`s value is n1.
     stage location of note_list`s value, then return that location`s icoef_table
+    Args: icoef_table, note_list, n1
+    Return: int
+        int - calculation note_list`s nl icoef value.
+    Raise:
+        nothing
     '''
     return 0
 
@@ -258,58 +292,68 @@ def append_list(note, link_table, note_list, icoef_table, length_table, time):
 	Raise:
 	    nothing
 	'''
-	# note_list append part...
-    for note_number in range(0, len(note_list)):
-        if note_list[note_number][-1] == -1:
-    		# if finished with -1, we need to append -1 to assure finished instruments.
-            note_list[note_number].append(-1)
-
-    for link_number in range(0, link_table[time]):
-        if len(link_table[time][link_number]) == 0:
-    		# Case of empty list.
-            for note_number in range(0, len(note_list)):
-                if note_list[note_number][-1] == link_number:
-                    note_list[note_number].append(-1)
-        elif len(link_table[time][link_number]) == 1:
-    		# Case of normal size ( 1 ) list.
-            for note_number in range(0, len(note_list)):
-                if note_list[note_number][-1] == link_number:
-                    note_list[note_number].append(link_table[time][link_number])
+    before_i = 0
+    for i in range(0, len(link_table[time])):
+        if link_table[time][i][0] - link_table[time][before_i][-1] < 2 or i == 0:
+            if len(link_table[time][i]) == 0:
+                for j in range(0, len(note_list)):
+                    if note_list[j][time] == i:
+                        note_list[j].append(-1)
+            elif len(link_table[time][i]) == 1:
+                before_i = i
+                for j in range(0, len(note_list)):
+                    if note_list[j][time] == i:
+                        note_list[j].append(link_table[time][i][0])
+            else:
+                before_i = i
+                j = 0
+                while j < len(note_list):
+                    if note_list[j][time] == i:
+                        for l in range(0, len(link_table[time][i]-1)):
+                            copy_to(note_list, j, copy(note_list[j], link_table[time][i][l]))
+                            copy_to(icoef_table, j, icoef_table[j])
+                            copy_to(length_table, j, length_table[j])
+                            j += 1
+                        j += 1
         else:
-    		# Case of size is larger then 2.
-			# Must append some instruments.to_insert = 0
-            for insert_number in range(0, len(note_list)):
-                if note_list[insert_number][-1] == link_number:
-                    to_insert = insert_number
-                    break
-            for _ in range(0, len(link_table[time][link_number])):
-    			# for all value 0 to SIZE(== link_table[time][link_number])...
-                note_list.insert(to_insert, [])
-				# copy note_list[to_insert+1] to note_list[to_insert]
-                for notes in range(0, note_list[to_insert+1]):
-                    note_list[to_insert].append(note_list[to_insert+1][notes])
-            for note_number in range(0, len(note_list)):
-                if note_list[note_number][-1] == link_number:
-                    note_list[note_number].append(link_table[time][link_number])
-		# Above can`t catch new instrument started.
-		# So we need to catch new instrument start like below.
-        if link_number > 0:
-            _link_number = link_number
-		    # For case of new instrument start.
-            while link_number > 0:
-                if link_table[time][_link_number] != []:
-    	    		# Ignore empty list to find real ins_num.
-                    break
-            ins_num = link_table[time][link_number][0] - link_table[time][_link_number][-1]
-	    	# ins_num is absent_instrumental`s number + 1.
-            for absent_number in range(0, ins_num -1):
-                note_list.insert(link_number, [])
-                for _ in range(0, len(note_list[link_number+1])-1):
-    		    	# Add prefix note to -1 cause new instrument is started.
-                    note_list[link_number].append(-1)
-                note_list[link_number].append(absent_number)
-	# note_list append part...
-	# icoef_table append part...
+            for k in range(link_table[time][before_i][-1]+1, link_table[time][i][0]):
+                #copy_to(note_list, k, [-1,-1,-1 ... -1,k] for range time+1)
+                #copy_to(icoef_table, k, [0, 0, 0 ... 0] for range time -1)
+                #copy_to(length_table, k, [0, 0, 0 ... 0] for range time - 1)
+                print("a")
+    append_icoef(link_table, note_list, icoef_table)
+    append_length(link_table, note_list, length_table)
+
+def copy_to(dest_list, dest, src_list):
+    '''
+    copy src_list to dest_list[dest] with insert method.
+    Args: dest_list, dest, src_list
+    Return:
+        nothing.
+    Raises:
+        nothing.
+    '''
+
+def append_icoef(link_table, note_list, icoef_list):
+    '''
+    append icoef_list with note_list and link_table.
+    Args: link_table, note_list, icoef_list
+    Return:
+        nothing.
+    Raises:
+        nothing.    
+    '''
+
+def append_length(link_table, note_list, length_table):
+    '''
+    append length_table with note_list and link_table.
+    Args: link_table, note_list, length_table
+    Return:
+        nothing.
+    Raises:
+        nothing.
+    '''
+
 def mid(note):
     '''
     Input note set and return average of some vector or return a remarkable values.
@@ -321,7 +365,7 @@ def mid(note):
         nothing
     '''
     average = 0
-    for i in range(0, len(note)) :
+    for i in range(0, len(note)):
         average += note[i]
     # just return average of note`s contents.
     return average / len(note)
@@ -377,18 +421,24 @@ def beatract(r_harmonics, note, link_table, note_list, icoef_table):
 
 def get_periodic(note_t1):
     '''
-
-    Args:
-    Return:
+    get note_t1`s periodic score.
+    if note_t1 have many notes, score up.
+    if note_t1 have periodical wave, score down.
+    Args: note_t1
+    Return: periodic_score
+        periodic_score - score if note_t1 have many periodical wave or decompose many.
     Raise:
         nothing.
     '''
 
 def get_weights(note, note_value, icoef_value):
-   '''
-
-    Args:
-    Return:
+    '''
+    get weights of note`s with note_value and icoef_value.
+    if icoef_value is large, weights are small.
+    if value`s magnitude is large, weights are bigger.
+    Args: note, note_value, icoef_value
+    Return: weights
+        weights - value which magnitude is big and which is sharing magnitude.
     Raise:
         nothing.
    '''
