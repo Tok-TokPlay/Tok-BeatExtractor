@@ -98,11 +98,13 @@ def stable_marriagement(note_t1, note_t2, link_table, length_table, time, thresh
     propose_queue = make_queue(note_t1, note_t2, length_table, difference, threshold)
     prefer_queue = make_queue(note_t1, note_t2, length_table, difference, threshold)
 
+    # i is index and value as same time.
+    # j is value related to i.
     free, i, j = is_free_note(propose_queue, link_table)
 
     while not free:
-        linked, linked_i = is_linked(j = propose_queue[i][j], link_table)
-        delete_relation(propse_queue, i, j)
+        linked, linked_i = is_linked(link_table, j = propose_queue[i][j])
+        delete_relation(propose_queue, i, j)
         if linked:
             if priority(prefer_queue, j, i) > priority(prefer_queue, j, linked_i):
                 delete_link(link_table, linked_i, j)
@@ -129,14 +131,20 @@ def is_free_note(propose_queue, link_table):
     Return:
     Raise:
     '''
+    return False, -1, -1
 
-def is_linked(i = -1, j = -1, link_table):
+def is_linked(link_table, i=-1, j=-1):
     '''
 
-    Args:
-    Return:
+    Args: i, j, link_table
+    Return: linked, linked_i
+        linked - if given i or j are linked with some notes, return True, else return False.
+        linked_i - if linked == True, return linked note`s list "note"`s index.( value )
+            else, return -1
     Raise:
     '''
+
+    return False, -1
 
 def delete_relation(propose_queue, i, j):
     '''
@@ -171,10 +179,43 @@ def make_link(link_table, i, j):
     '''
 
 def coverage(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold):
-    print("A")
+    '''
+    '''
+    difference = distance(note_t1, note_t2)
+    for note_number1 in range(0, len(note_t1)):
+        linked, _ = is_linked(link_table, i=note_number1)
+        if not linked:
+            for note_number2 in range(0, len(note_t2)):
+                acceptable = acceptable_note(difference, note_number1,\
+                note_number2, time, threshold)
+                if acceptable:
+                    make_link(link_table, note_number1, note_number2)
+                    break
+
+def acceptable_note(difference, i, j, time, threshold):
+    '''
+    '''
+    return False
 
 def seperate(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold):
-    print("A")
+    '''
+    '''
+    difference = distance(note_t1, note_t2)
+    for n1 in range(0, len(note_t1)):
+        icoef = calc_icoef(icoef_table, note_list, n1)
+        for n2 in range(0, len(note_t2)):
+            if icoef > 1:
+                if acceptable_note(difference, n1, n2, time, threshold):
+                    make_link(link_table, n1, n2)
+            else :
+                break
+
+def calc_icoef(icoef_table, note_list, n1):
+    '''
+    calculate icoef with time0 to time1`s note_list`s value is n1.
+    stage location of note_list`s value, then return that location`s icoef_table
+    '''
+    return 0
 
 def append_list(note, link_table, note_list, icoef_table, length_table, time):
     '''
