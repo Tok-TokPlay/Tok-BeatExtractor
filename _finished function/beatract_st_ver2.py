@@ -439,21 +439,25 @@ def append_list(note, link_table, note_list, icoef_table, length_table, time):
                 while j < len(note_list):
                     if note_list[j][time] == i:
                         for l in range(0, len(link_table[time][i]-1)):
-                            copy_to(note_list, j, copy(note_list[j], link_table[time][i][l]))
+                            copy_to(note_list, j, copy_list(note_list[j], link_table[time][i][l]))
                             copy_to(icoef_table, j, icoef_table[j])
                             copy_to(length_table, j, length_table[j])
                             j += 1
                         j += 1
         else:
             for k in range(link_table[time][before_i][-1]+1, link_table[time][i][0]):
-                #copy_to(note_list, k, [-1,-1,-1 ... -1,k] for range time+1)
-                #copy_to(icoef_table, k, [0, 0, 0 ... 0] for range time -1)
-                #copy_to(length_table, k, [0, 0, 0 ... 0] for range time - 1)
-                print("a")
-    append_icoef(link_table, note_list, icoef_table)
-    append_length(link_table, note_list, length_table)
+                copy_to(note_list, k, make_list(-1, time, k))
+                copy_to(icoef_table, k, make_list(0, time-1))
+                copy_to(length_table, k, make_list(0, time-1))
+
+    append_icoef(note_list, icoef_table)
+    append_length(note, note_list, length_table, time)
+    link_table.append([])
+    for _ in range(0, len(link_table[time])):
+        link_table[time+1].append([])
 
 def copy_to(dest_list, dest, src_list):
+    
     '''
     copy src_list to dest_list[dest] with insert method.
     Args: dest_list, dest, src_list
@@ -462,18 +466,109 @@ def copy_to(dest_list, dest, src_list):
     Raises:
         nothing.
     '''
+    # Add empty list at dest_list[dest].
+    dest_list.insert(dest, [])
+    for seq in len(0, len(src_list)):
+        # Copy src_list into empty list.
+        dest_list[dest].append(src_list[seq])
 
-def append_icoef(link_table, note_list, icoef_list):
+def make_list(list_contents, times, trail=-2):
+    '''
+    make list with [list_contents, list_contents, ... ] for times`s time.
+    if trail is not -2, then add trail to list and return it.
+    Args: list_contets, times, trail
+        list_contents - repeat value.
+        times - length of default size of list.
+        trial - if not -2, append it to return_list.
+    Return: made_list
+        made_list - [list_contents, list_contents, ... ] or
+                  - [list_contents, list_contents, ... , trail]
+    Raises:
+        nothing.
+    '''
+    made_list = []
+    for _ in range(0, times):
+        made_list.append(list_contents)
+    if trail != -2:
+        made_list.append(trail)
+    return made_list
+
+def copy_list(_list, trail=-2):
+    '''
+    copy one dimension list "one_D_list" and return it.
+    and if trail is not -1, then append it to end of list.
+    Args: one_D_list, trail
+        one_D_list - will be copied list.
+        trail - if not -2, then append it at the end.
+    Return: copy_list
+        copy_list - copied list with input.
+    Raise:
+        nothing.
+    '''
+    # Initialize copy_list.
+    copied_list = []
+    # For all value in range of one_D_list...
+    for list_number in range(0, len(_list)):
+        # Copy it.
+        copied_list.append(_list[list_number])
+    if trail != -2:
+        copied_list.append(trail)
+    return copy_list
+
+def append_icoef(note_list, icoef_list):
     '''
     append icoef_list with note_list and link_table.
     Args: link_table, note_list, icoef_list
+        link_table - tied notes which is related to some other note.
+            bundle of notes are other represent of instrument.
+            [ at time 0[[0], [0], [0], ... , [0], [1], [0]],
+              at time 1[[1], [1, 2], [1], ... , [1], [1, 2], [2]],
+              at time 2[[2], [1, 2], [2], ... , [2], [1, 2], [2]],
+              ...
+              at time t[[t], [t], [t], ... , [t], [t-1, t], [t]] ]
+        note_list - note list which represent instrumental.
+            [ note_list 0 [0, 0, 0, ... 0, 1, 0],
+              note_list 1 [1, 1, 1, ... 1, 1, 1],
+              note_list 2 [2, 1, 2, ... 1, 1, 2],
+              ...
+              note_list t [t, t-1, t, ... t, t-1, t] ]
+        icoef_table - inversed coefficient of notes. means, value`s number is sharing that
+            harmonics magnitude value.
+            [ coef 0 [1, 1, 1, ... 1, 3, 1],
+              coef 1 [1, 2, 1, ... 2, 3, 1],
+              coef 2 [1, 2, 1, ... 2, 3, 1],
+              ...
+              coef t [1, 1, 1, ... 1, 2, 1] ]
     Return:
         nothing.
     Raises:
-        nothing.    
+        nothing.
     '''
+    # Coef number is started from 1.
+    same_number = 1
+    coef_number = 0
 
-def append_length(link_table, note_list, length_table):
+    for note_number in range(1, len(note_list) - 1):
+        # if note is -1, ( empty ) coef is 0.
+        if note_list[note_number] == -1:
+            icoef_list[coef_number].append(0)
+            coef_number += 1
+        elif note_list[note_number] == note_list[note_number + 1]:
+            same_number += 1
+        else:
+            for _ in range(0, same_number):
+                # icoef_list. append(1 or smae_numbers)
+                icoef_list[coef_number].append(same_number)
+                coef_number += 1
+            same_number = 1
+        # At least one time for len(note_list)-1.
+        for _ in range(0, same_number):
+            # icoef_list. append(1 or smae_numbers)
+            icoef_list[coef_number].append(same_number)
+            coef_number += 1
+        same_number = 1
+
+def append_length(note, note_list, length_table, time):
     '''
     append length_table with note_list and link_table.
     Args: link_table, note_list, length_table
@@ -482,6 +577,12 @@ def append_length(link_table, note_list, length_table):
     Raises:
         nothing.
     '''
+    # for all range of note_list...
+    for note_number in range(0, len(note_list)):
+        # if note[time][i] and note[time+1][j] are linked, length is difference between two notes.
+        length = mid(note[time][note_list[note_number][-2]]) \
+        - mid(note[time+1][note_list[note_number][-1]])
+        length_table[note_number].append(length)
 
 def mid(note):
     '''
@@ -541,8 +642,9 @@ def beatract(r_harmonics, note, link_table, note_list, icoef_table):
         weights.append([])
         for sequence in range(0, len(note_list[note_number])):
             # Weights are weights value / coef * periodicality.
-            weights[note_number].append(get_weights(note, note_list[note_number][sequence], \
-            icoef_table[note_number][sequence]) * periodic[note_number])
+            weights[note_number].append(\
+            get_weights(r_harmonics, note, note_list[note_number][sequence],\
+            icoef_table[note_number][sequence], sequence) * periodic[note_number])
 
     real_beat = []
     # Add all beat weights.
@@ -564,15 +666,31 @@ def get_periodic(note_t1):
     Raise:
         nothing.
     '''
+    # Calculate Portions.
+    empty_number = 0
+    for note_number in range(0, len(note_t1)):
+        if note_t1[note_number] == -1:
+            empty_number += 1
+    # empty_number / len(note_t1) is portion score.
 
-def get_weights(note, note_value, icoef_value):
+
+
+
+def get_weights(r_harmonics, note, note_value, icoef_value, sequence):
     '''
     get weights of note`s with note_value and icoef_value.
     if icoef_value is large, weights are small.
     if value`s magnitude is large, weights are bigger.
-    Args: note, note_value, icoef_value
+    Args: note, note_list, note_value, icoef_value
     Return: weights
         weights - value which magnitude is big and which is sharing magnitude.
     Raise:
         nothing.
-   '''
+    '''
+    magnitude_sum = 0
+    # Add all magnitudes for at all value in note[time][note_value]
+    for note_index in range(0, len(note[sequence][note_value])):
+        magnitude_sum += abs(r_harmonics[note_index][sequence])
+        # abs(r_harmonics) are magnitudes.
+    weights = magnitude_sum / icoef_value
+    return weights
