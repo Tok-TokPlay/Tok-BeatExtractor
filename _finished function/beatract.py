@@ -298,31 +298,35 @@ def stage_note(r_harmonics):
         r_harmonics - real harmonics value map with 0 which is smaller then threshold.
     Returns : note
         note - for all time sequence, clustering all notes to list.
-    Raises : 
+    Raises :
         nothing
     '''
     note = []
     # Initialize note list.
-    for t in range(0, len(r_harmonics[0])) :
+    for t in range(0, len(r_harmonics[0])):
         note.append([])
         note_number = 0
-        on_writng = False
-        # Initialize note[] list and set on_writing to false, because start must be start with not writing.
-        for f in range(0, len(r_harmonics)) :
-            if harmonic[f][t] == 0 : 
-                if on_writing :
+        on_writing = False
+        # Initialize note[] list and set on_writing to false, because start
+		# must be start with not writing.
+        for f in range(0, len(r_harmonics)):
+            if r_harmonics[f][t] == 0:
+                if on_writing:
                     on_writing = False
-                    note_number += 1				
-                    # At writing some note to list, if meet 0 then stop writing and get ready to input next note.
-                    # if not writing, befores are 
-            else : 
-                if on_writing : 
+                    note_number += 1
+                    # At writing some note to list, if meet 0 then stop writing and
+					# get ready to input next note.
+                    # if not writing, befores are
+            else:
+                if on_writing:
                     # Keep writing.
                     # writing which frequency is at "note_number"`s note.
                     note[t][note_number].append(f)
-                else : 
-                    # if note doesn't write, then turn on write flag ( on_writing ) and append list and "f".
+                else:
+                    # if note doesn't write, then turn on write flag
+					# ( on_writing ) and append list and "f".
                     on_writing = True
                     note[t].append([])
                     note[t][note_number].append(f)
     return note
+	
