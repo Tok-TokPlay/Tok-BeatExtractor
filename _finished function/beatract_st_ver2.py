@@ -104,6 +104,7 @@ def stable_marriagement(note_t1, note_t2, link_table, length_table, time, thresh
     free, i, j = is_free_note(propose_queue, link_table)
 
     while not free:
+        # if there exiest some linkable values...
         linked, linked_i = is_linked(link_table, j=propose_queue[i][j])
         delete_relation(propose_queue, i, j)
         if linked:
@@ -171,7 +172,7 @@ def get_length(length_table, time, i):
     # take all value in length_table`s time-1`s i th note`s length.
     average = 0
     for length_num in range(0, len(length_table[time-1][i])):
-        average += length_table[time-1][i][length_num]
+        average += abs(length_table[time-1][i][length_num])
     # ... and return average of length sum.
     return average / len(length_table[time-1][i])
 
@@ -281,7 +282,7 @@ def make_link(link_table, time, i, j):
     '''
     # Make link with at time "time", i`th notes to j.
     link_table[time][i].append(j)
-    
+
 def coverage(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold):
     '''
     converge which is not linked and have acceptable link notes.
@@ -295,23 +296,27 @@ def coverage(note_t1, note_t2, link_table, note_list, icoef_table, length_table,
     for note_number1 in range(0, len(note_t1)):
         linked, _ = is_linked(link_table, i=note_number1)
         if not linked:
+            # if not linked note_number1,
             for note_number2 in range(0, len(note_t2)):
-                acceptable = acceptable_note(difference, note_number1,\
-                note_number2, time, threshold)
-                if acceptable:
+                # if time"time"`s note_number1 and time "time+1"`s note_number2 are linkable...
+                if acceptable_note(length_table, difference, note_number1,\
+                note_number2, time, threshold):
                     make_link(link_table, time, note_number1, note_number2)
                     break
 
-def acceptable_note(difference, i, j, time, threshold):
+def acceptable_note(length_table, difference, i, j, time, threshold):
     '''
-    Check acceptablility with difference[i][j] + threshold is in length acceptable at time.
+    Check acceptablility with difference[i][j] is in length acceptable at time.
     Args: difference, i, j, time, threshold
     Return: bool
         bool - if acceptable, return True, else return False.
     Raise:
         nothing.
     '''
-    return False
+    if get_length(length_table, time, i) + threshold > difference[i][j]:
+        return True
+    else:
+        return False
 
 def seperate(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold):
     '''
@@ -327,9 +332,9 @@ def seperate(note_t1, note_t2, link_table, note_list, icoef_table, length_table,
         icoef = calc_icoef(icoef_table, note_list, n1)
         for n2 in range(0, len(note_t2)):
             if icoef > 1:
-                if acceptable_note(difference, n1, n2, time, threshold):
-                    make_link(link_table, n1, n2)
-            else :
+                if acceptable_note(length_table, difference, n1, n2, time, threshold):
+                    make_link(link_table, time, n1, n2)
+            else:
                 break
 
 def calc_icoef(icoef_table, note_list, n1):
