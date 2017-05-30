@@ -54,7 +54,8 @@ def tie_note(note, threshold):
         note_list[notes].append(notes)
 
     # link note[0] and note[1] with stable_marriagement
-    append_list(note, link_table, note_list, icoef_table, length_table)
+    append_list(note, link_table, note_list, icoef_table, length_table, 0)
+
     for time in range(1, len(note)-1):
 		# Stable marriagement -> link notes 1 : 1
         stable_marriagement(note[time], note[time+1], link_table, length_table, time, threshold)
@@ -65,7 +66,7 @@ def tie_note(note, threshold):
         seperate(note[time], note[time+1], link_table, note_list, icoef_table,\
 		length_table, time, threshold)
 		# renew 4 tables
-        append_list(note, link_table, note_list, icoef_table, length_table)
+        append_list(note, link_table, note_list, icoef_table, length_table, time)
     return link_table, note_list, icoef_table, length_table
 
 def stable_marriagement(note_t1, note_t2, link_table, length_table, time, threshold):
@@ -95,8 +96,8 @@ def stable_marriagement(note_t1, note_t2, link_table, length_table, time, thresh
 	    nothing
 	'''
     difference = distance(note_t1, note_t2)
-    propose_queue = make_queue(note_t1, note_t2, length_table, difference, threshold)
-    prefer_queue = make_queue(note_t1, note_t2, length_table, difference, threshold)
+    propose_queue = make_queue(note_t1, note_t2, length_table, difference, threshold, time)
+    prefer_queue = make_queue(note_t2, note_t1, length_table, difference, threshold, time)
 
     # i is index and value as same time.
     # j is value related to i.
@@ -112,23 +113,88 @@ def stable_marriagement(note_t1, note_t2, link_table, length_table, time, thresh
         else:
             make_link(link_table, i, j)
         free, i, j = is_free_note(propose_queue, link_table)
-def make_queue(note_t1, note_t2, length_table, difference, threshold):
+def make_queue(note_t1, note_t2, length_table, difference, threshold, time):
     '''
     make propose queue ( prefer list ) for note_t1 to note_t2.
-    Args:
+    if note_t1 and note_t2`s length is smaller then before_length + threshold, append it.
+    Args: note_t1, note_t2, length_table, difference, threshold
+        note_t1, note_t2 - note_t1 is standard note and note_t2 is compared note.
+        length_table - length information is saved here.
+            [ at time 0[[0], [0], [0], ... , [0], [1], [0]],
+              at time 1[[1], [1, 2], [1], ... , [1], [1, 2], [2]],
+              at time 2[[2], [1, 2], [2], ... , [2], [1, 2], [2]],
+              ...
+              at time t[[t], [t], [t], ... , [t], [t-1, t], [t]] ]
+        difference - length between note_t1 and note_t2.
+        threshold - threshold value which calculated at make decision.
+        time - t1`s time. t2 mean "time+1".
     Return: prefer_list
-        prefer_list -
+        prefer_list - propose queue of note_t1 to note_t2.
+        [ 0 th value`s priority is [0, 1, 2],
+          1 th value`s priority is [1, 2, 3],
+          2 th value`s priority is [2, 3, 4, 5],
+          ...
+          n th value`s priority is [n-2, n-1, n] ]
     Raise:
-        nothing
+        nothing.
     '''
+    # Initialize prefer_list with empty list.
     prefer_list = []
+    for t1_number in range(0, len(note_t1)):
+        # Add empty list at index of t1_number.
+        prefer_list.append([])
+        for t2_number in range(0, len(note_t2)):
+            if get_length(length_table, time, t1_number) + threshold > \
+            difference[t1_number][t2_number]:
+                # Add prefer_list to index "t2_number".
+                prefer_list[t1_number].append(t2_number)
     return prefer_list
+
+def get_length(length_table, time, i):
+    '''
+    get length from length table which is linked with i th note at time "time-1" to "time".
+    Args: length_table, time, i
+        length_table - length information is saved here.
+            [ at time 0[[0], [0], [0], ... , [0], [1], [0]],
+              at time 1[[1], [1, 2], [1], ... , [1], [1, 2], [2]],
+              at time 2[[2], [1, 2], [2], ... , [2], [1, 2], [2]],
+              ...
+              at time t[[t], [t], [t], ... , [t], [t-1, t], [t]] ]
+        time - time which will be used in when`s length.
+        i - note`s index which note want to calculate.
+    Return: length
+        length - length_table
+    Raise:
+        nothing.
+    '''
+    # take all value in length_table`s time-1`s i th note`s length.
+    average = 0
+    for length_num in range(0, len(length_table[time-1][i])):
+        average += length_table[time-1][i][length_num]
+    # ... and return average of length sum.
+    return average / len(length_table[time-1][i])
 
 def is_free_note(propose_queue, link_table):
     '''
     Calculate is ther free note in link_table which is at propose_queue.
     Args: propose_queue, link_table
+        propose_queue - propose queue of note_t1 to note_t2.
+        [ 0 th value`s priority is [0, 1, 2],
+          1 th value`s priority is [1, 2, 3],
+          2 th value`s priority is [2, 3, 4, 5],
+          ...
+          n th value`s priority is [n-2, n-1, n] ]
+        link_table - tied notes which is related to some other note.
+            bundle of notes are other represent of instrument.
+            [ at time 0[[0], [0], [0], ... , [0], [1], [0]],
+              at time 1[[1], [1, 2], [1], ... , [1], [1, 2], [2]],
+              at time 2[[2], [1, 2], [2], ... , [2], [1, 2], [2]],
+              ...
+              at time t[[t], [t], [t], ... , [t], [t-1, t], [t]] ]
     Return: Bool, i, j
+        Bool - does linkable notes are exist.
+        i - if linkable, t1`s notes index.
+        j - if linkable, t2`s notes index.
     Raise:
         nothing.
     '''
