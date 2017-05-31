@@ -97,40 +97,19 @@ def get_threshold(CQT_result, seed=0.75, result_hop=1000):
             default is 0.75 and this value should be real value at 0.5 ~ 1.
         result_hop - ignore value to take tangent of values. default is 1000
     Returns :
-        min / max value of threshold. threshold value.
+        threshold value.
 	Raises :
         nothing.
     '''
     result_list = []
-    for f in range(0, len(CQT_result)):
-        for t in range(0, len(CQT_result[0])):
-            result_list.append(abs(CQT_result[f][t]))
+    for frequency in range(0, len(CQT_result)):
+        for time in range(0, len(CQT_result[0])):
+            result_list.append(abs(CQT_result[frequency][time]))
 
     result_list.sort()
-    # Copy List to sort result.
-    sorted_tangent = []
-    # to using Differential, get tangent values.
-    for i in range(0, len(result_list) - result_hop):
-        sorted_tangent.append((result_list[i + result_hop] - result_list[i]) / result_hop)
-        maximum_tangent = 0
-        maximum_index = -1
-        for i in range(0, len(sorted_tangent)):
-            if maximum_tangent < sorted_tangent[i]:
-                maximum_tangent = sorted_tangent[i]
-                maxumum_index = i
+    length = len(result_list)
 
-    small_tangent_index = -1
-    large_tangent_index = -1
-    # get result with calcuated tangent values.
-    for i in range(0, len(sorted_tangent)):
-        if small_tangent_index == -1:
-            if sorted_tangent[i] > (1 - seed) * maximum_tangent:
-                small_tangent_index = i
-        if large_tangent_index == -1:
-            if sorted_tangent[i] > (seed) * maximum_tangent:
-                large_tangent_index = i
-
-    return result_list[small_tangent_index], result_list[large_tangent_index]
+    return result_list[int(length*seed)]
 
 def parse_noise(CQT_result, MAG_threshold):
     '''
@@ -295,7 +274,7 @@ def stage_note(r_harmonics):
                     note[times].append([])
                     note[times][note_number].append(frequency)
     return note
-	
+
 def beatract(dir_name, file_name=-1, save_dir=-1):
     '''
     at given dir_name/file_name extract beat and save it to txt file at save to.
@@ -304,7 +283,7 @@ def beatract(dir_name, file_name=-1, save_dir=-1):
     Raise:
         nothing.
     '''
-    
+
     dest_file = to_wav(dir_name, dir_name, file_name)
     # if want to extract some given length, give load to duration value.
     audio_list, sampling_rate = lb.load(dest_file, offset=0.0)
@@ -312,8 +291,8 @@ def beatract(dir_name, file_name=-1, save_dir=-1):
     music = lb.cqt(audio_list, sr=sampling_rate, fmin=lb.note_to_hz('C1'), n_bins=240, \
     bins_per_octave=12*4)
     print "file CQT finished..."
-    small_th, _ = get_threshold(music)
-    _, r_harmonic = parse_noise(music, small_th)
+    threshold = get_threshold(music)
+    _, r_harmonic = parse_noise(music, threshold)
     print "file CQT harmonics extracted..."
     note = stage_note(r_harmonic)
 
