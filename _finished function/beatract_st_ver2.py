@@ -85,16 +85,10 @@ def tie_note(note, threshold):
     # j is value related to i.
     free, i, j = is_free_note(propose_queue, link_table, 0)
     while free:
-        print ""
-        print propose_queue
-        print link_table
         # if there exiest some linkable values...
-        print "j : " + str(j)
-        print "propose_queue : " + str(propose_queue[i][j])
+
         linked, linked_i = is_linked(link_table, 0, j=propose_queue[i][j])
         # delete relation with propose_i]queue i and j.
-        print linked
-        print "i : " + str(i) + " likned_i : " + str(linked_i)
         if linked:
             # if already linked...
             if priority(prefer_queue, propose_queue[i][j], i) > priority(prefer_queue, \
@@ -109,17 +103,16 @@ def tie_note(note, threshold):
         delete_relation(propose_queue, i, propose_queue[i][j])
         free, i, j = is_free_note(propose_queue, link_table, 0)
 
-    print propose_queue
-    print link_table
     ########################## Stable Marriagement #############################################
 	# renew 4 tables.
-    
+
     append_list(note, link_table, note_list, icoef_table, length_table, 0)
 
 
     for time in range(1, len(note)-1):
 		# Stable marriagement -> link notes 1 : 1
-        stable_marriagement(note[time], note[time+1], link_table, note_list, length_table, time, threshold)
+        stable_marriagement(note[time], note[time+1], link_table, note_list, length_table, \
+        time, threshold)
 		# Converge -> link notes n : 1
         coverage(note[time], note[time+1], link_table, length_table, time, threshold)
 		# Seperate -> link notes 1 : n
@@ -127,6 +120,7 @@ def tie_note(note, threshold):
 		length_table, time, threshold)
 		# renew 4 tables
         append_list(note, link_table, note_list, icoef_table, length_table, time)
+    del link_table[-1]
     return link_table, note_list, icoef_table, length_table
 
 def stable_marriagement(note_t1, note_t2, link_table, note_list, length_table, time, threshold):
@@ -508,7 +502,10 @@ def append_list(note, link_table, note_list, icoef_table, length_table, time):
     # Append iceof_table with note_list.
     append_icoef(note_list, icoef_table)
     # Append length_table at note.
+    print time
     append_length(note, note_list, length_table, time)
+    print "length : " + str(length_table)
+    print "note : " + str(note_list)
     # Append link_table empty...
     # This mean Initailize which is not linked.
     link_table.append([])
@@ -602,26 +599,19 @@ def append_icoef(note_list, icoef_list):
     # Coef number is started from 1.
     same_number = 1
     coef_number = 0
+    recorded_number = 0
 
-    for note_number in range(1, len(note_list) - 1):
-        # if note is -1, ( empty ) coef is 0.
-        if note_list[note_number] == -1:
-            icoef_list[coef_number].append(0)
-            coef_number += 1
-        elif note_list[note_number] == note_list[note_number + 1]:
+    while coef_number < len(note_list)-1:
+        if note_list[coef_number] == note_list[coef_number+1]:
             same_number += 1
         else:
             for _ in range(0, same_number):
-                # icoef_list. append(1 or smae_numbers)
-                icoef_list[coef_number].append(same_number)
-                coef_number += 1
-            same_number = 1
-        # At least one time for len(note_list)-1.
-    for _ in range(0, same_number):
-        # icoef_list. append(1 or smae_numbers)
-        icoef_list[coef_number].append(same_number)
+                icoef_list[recorded_number].append(same_number)
+                recorded_number += 1
+                same_number = 1
         coef_number += 1
-    same_number = 1
+    for _ in range(recorded_number, len(note_list)):
+        icoef_list[recorded_number].append(same_number)
 
 def append_length(note, note_list, length_table, time):
     '''
@@ -635,8 +625,8 @@ def append_length(note, note_list, length_table, time):
     # for all range of note_list...
     for note_number in range(0, len(note_list)):
         # if note[time][i] and note[time+1][j] are linked, length is difference between two notes.
-        length = mid(note[time][note_list[note_number][time]]) \
-        - mid(note[time+1][note_list[note_number][time+1]])
+        length = mid(note[time-1][note_list[note_number][time-1]]) \
+        - mid(note[time][note_list[note_number][time]])
 
         length_table[note_number].append(length)
 
