@@ -421,20 +421,23 @@ def append_list(note, link_table, note_list, icoef_table, length_table, time):
 	Raise:
 	    nothing
 	'''
-    before_i = 0
+    # before_index means last appeared not empty list.
+    before_index = 0
+    # for all index1 of link_table[time]...
+    # This mean link_table`s all note of 
     for i in range(0, len(link_table[time])):
-        if link_table[time][i][0] - link_table[time][before_i][-1] < 2 or i == 0:
+        if link_table[time][i][0] - link_table[time][before_index][-1] < 2 or i == 0:
             if len(link_table[time][i]) == 0:
                 for j in range(0, len(note_list)):
                     if note_list[j][time] == i:
                         note_list[j].append(-1)
             elif len(link_table[time][i]) == 1:
-                before_i = i
+                before_index = i
                 for j in range(0, len(note_list)):
                     if note_list[j][time] == i:
                         note_list[j].append(link_table[time][i][0])
             else:
-                before_i = i
+                before_index = i
                 j = 0
                 while j < len(note_list):
                     if note_list[j][time] == i:
@@ -445,7 +448,7 @@ def append_list(note, link_table, note_list, icoef_table, length_table, time):
                             j += 1
                         j += 1
         else:
-            for k in range(link_table[time][before_i][-1]+1, link_table[time][i][0]):
+            for k in range(link_table[time][before_index][-1]+1, link_table[time][i][0]):
                 copy_to(note_list, k, make_list(-1, time, k))
                 copy_to(icoef_table, k, make_list(0, time-1))
                 copy_to(length_table, k, make_list(0, time-1))

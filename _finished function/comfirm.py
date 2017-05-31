@@ -3,6 +3,8 @@ debugging console.
 '''
 
 import beatract as bt
+import beatract_st_ver2 as bt2
+
 '''
 make_empty_list test code
 '''
@@ -15,6 +17,7 @@ print (test_list)
 ''' 
 stage_note test code
 '''
+
 test_notes = \
 [\
     [0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0],\
@@ -23,4 +26,8 @@ test_notes = \
     [1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1],\
     [0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1]]
 note = bt.stage_note(test_notes)
+'''
 print(note)
+'''
+
+bt2.tie_note(note, 2)
