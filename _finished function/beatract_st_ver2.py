@@ -613,7 +613,12 @@ def append_icoef(note_list, icoef_list):
     recorded_number = 0
 
     while coef_number < len(note_list)-1:
-        if note_list[coef_number] == note_list[coef_number+1]:
+        if note_list[coef_number][-1] == -1 :
+            for _ in range(0, same_number):
+                icoef_list[recorded_number].append(0)
+                recorded_number += 1
+                same_number = 1
+        elif note_list[coef_number] == note_list[coef_number+1]:
             same_number += 1
         else:
             for _ in range(0, same_number):
