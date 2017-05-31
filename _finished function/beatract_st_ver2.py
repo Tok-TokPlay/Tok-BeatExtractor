@@ -113,7 +113,7 @@ def tie_note(note, threshold):
 		# Converge -> link notes n : 1
         coverage(note[time], note[time+1], link_table, length_table, time, threshold)
 		# Seperate -> link notes 1 : n
-        seperate(note[time], note[time+1], link_table, icoef_table,\
+        seperate(note[time], note[time+1], link_table, note_list, icoef_table,\
 		length_table, time, threshold)
 		# renew 4 tables
         append_list(note, link_table, note_list, icoef_table, length_table, time)
@@ -384,7 +384,7 @@ def acceptable_note(length_table, difference, i, j, time, threshold):
     else:
         return False
 
-def seperate(note_t1, note_t2, link_table, icoef_table, length_table, time, threshold):
+def seperate(note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold):
     '''
     Seperate if coef is lareger then 2 and have acceptable_note in range of length.
     Args: note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold
@@ -395,7 +395,7 @@ def seperate(note_t1, note_t2, link_table, icoef_table, length_table, time, thre
     '''
     difference = distance(note_t1, note_t2)
     for t1_number in range(0, len(note_t1)):
-        icoef = calc_icoef(icoef_table, time, t1_number)
+        icoef = calc_icoef(icoef_table, note_list, time, t1_number)
         for t2_number in range(0, len(note_t2)):
             if icoef > 1:
                 if acceptable_note(length_table, difference, t1_number, t2_number, time, threshold):
@@ -403,7 +403,7 @@ def seperate(note_t1, note_t2, link_table, icoef_table, length_table, time, thre
             else:
                 break
 
-def calc_icoef(icoef_table, time, note_list_number):
+def calc_icoef(icoef_table, note_list, time, note_list_number):
     '''
     calculate icoef with time0 to time1`s note_list`s value is note_list_number.
     stage location of note_list`s value, then return that location`s icoef_table
@@ -428,7 +428,9 @@ def calc_icoef(icoef_table, time, note_list_number):
         nothing
     '''
     # Return icoef value of table which note number is "note_list_number" and at time.
-    return icoef_table[note_list_number][time]
+    for note_number in range(0, len(note_list)):
+        if note_list[note_number][time] == note_list_number:
+            return [note_number][time]
 
 def append_list(note, link_table, note_list, icoef_table, length_table, time):
     '''
