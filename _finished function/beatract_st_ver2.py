@@ -114,7 +114,9 @@ def tie_note(note, threshold):
         stable_marriagement(note[time], note[time+1], link_table, note_list, length_table, \
         time, threshold)
 		# Converge -> link notes n : 1
-        coverage(note[time], note[time+1], link_table, length_table, time, threshold)
+        print link_table[time]
+        coverage(note[time], note[time+1], link_table, note_list, length_table, time, threshold)
+        print link_table[time]
 		# Seperate -> link notes 1 : n
         seperate(note[time], note[time+1], link_table, note_list, icoef_table,\
 		length_table, time, threshold)
@@ -151,8 +153,10 @@ def stable_marriagement(note_t1, note_t2, link_table, note_list, length_table, t
 	'''
     difference1 = distance(note_t1, note_t2)
     difference2 = distance(note_t2, note_t1)
-    propose_queue = make_queue(note_t1, note_t2, length_table, note_list, difference1, threshold, time)
-    prefer_queue = make_queue(note_t2, note_t1, length_table, note_list, difference2, threshold, time)
+    propose_queue = make_queue(note_t1, note_t2, length_table, note_list, difference1, threshold, \
+    time)
+    prefer_queue = make_queue(note_t2, note_t1, length_table, note_list, difference2, threshold, \
+    time)
 
     # i is index and value as same time.
     # j is value related to i.
@@ -160,8 +164,12 @@ def stable_marriagement(note_t1, note_t2, link_table, note_list, length_table, t
 
     while free:
         # if there exiest some linkable values...
+
         linked, linked_i = is_linked(link_table, time, j=propose_queue[i][j])
         # delete relation with propose_queue i and j.
+        print linked
+        print str(j) + " " + str(propose_queue[i][j])
+        print link_table[time]
         if linked:
             # if already linked...
             if priority(prefer_queue, propose_queue[i][j], i) > priority(prefer_queue, \
@@ -174,6 +182,7 @@ def stable_marriagement(note_t1, note_t2, link_table, note_list, length_table, t
             make_link(link_table, time, i, propose_queue[i][j])
         # renew existance of linkable notes and i, j.
         delete_relation(propose_queue, i, propose_queue[i][j])
+        print link_table[time]
         free, i, j = is_free_note(propose_queue, link_table, time)
 
 def make_queue(note_t1, note_t2, length_table, note_list, difference, threshold, time):
@@ -366,7 +375,7 @@ def make_link(link_table, time, i, j):
     # Make link with at time "time", i`th notes to j.
     link_table[time][i].append(j)
 
-def coverage(note_t1, note_t2, link_table, length_table, time, threshold):
+def coverage(note_t1, note_t2, link_table, note_list, length_table, time, threshold):
     '''
     converge which is not linked and have acceptable link notes.
     Args: note_t1, note_t2, link_table, note_list, icoef_table, length_table, time, threshold
@@ -381,7 +390,9 @@ def coverage(note_t1, note_t2, link_table, length_table, time, threshold):
         if not linked:
             # if not linked note_number1,
             note_number2 = get_smallest_index(note_number1, difference)
-            make_link(link_table, time, note_number1, note_number2)
+            if difference[note_number1][note_number2] < get_length(length_table, note_list, time, \
+            note_number1) + threshold:
+                make_link(link_table, time, note_number1, note_number2)
 
 def get_smallest_index(note_number1, difference):
     '''
@@ -673,9 +684,9 @@ def append_note(link_table, note_list, icoef_table, length_table, time):
         if absent:
             before_index = index
             for insert_number in range(start_note, finish_note):
-                copy_to(note_list, insert_number, make_list(-1, time, insert_number))
-                copy_to(icoef_table, insert_number, make_list(0, time))
-                copy_to(length_table, insert_number, make_list(0, time-1))
+                copy_to(note_list, insert_number, make_list(-1, time + 1, insert_number + 1))
+                copy_to(icoef_table, insert_number, make_list(0, time + 1))
+                copy_to(length_table, insert_number, make_list(0, time))
         if len(link_table[time][index]) == 0:
             add_notelist(note_list, time, index, -1)
         elif len(link_table[time][index]) == 1:
@@ -686,16 +697,19 @@ def append_note(link_table, note_list, icoef_table, length_table, time):
             for copy_number in range(0, len(note_list)):
                 if capiable(note_list, time, index, copy_number):
                     basic = copy_list(note_list[copy_number])
+                    # Delete basic lists.
                     del note_list[copy_number]
+
                     for note_num in range(0, len(link_table[time][index])):
                         copy_to(note_list, copy_number, copy_list(basic, \
                         trail=link_table[time][index][note_num]))
                         copy_to(icoef_table, copy_number, copy_list(icoef_table[copy_number]))
                         copy_to(length_table, copy_number, copy_list(length_table[copy_number]))
+                    # Delete basic lists.
                     del icoef_table[copy_number]
                     del length_table[copy_number]
         for finished_note in range(0, len(note_list)):
-            if note_list[finished_note][time] == -1:
+            if len(note_list[finished_note]) == time and note_list[finished_note][-1] == -1:
                 note_list[finished_note].append(-1)
 
 def absent_note(link_table, index, before_index, time):

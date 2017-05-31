@@ -36,7 +36,7 @@ for i in range(0, len(note)):
     print(note[i])
 print "============================note===========================----======"
 
-link_table, note_list, icoef_table, length_table = bt2.tie_note(note, 2)
+link_table, note_list, icoef_table, length_table = bt2.tie_note(note, 1)
 print "============================link====================================="
 print("length of link_table : " + str(len(link_table)))
 for i in range(0, len(link_table)):
