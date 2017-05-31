@@ -806,7 +806,7 @@ def distance(note_t1, note_t2):
             mid(note_t2[note_number2])))
     return difference
 
-def beatract(r_harmonics, note, note_list, icoef_table):
+def weightract(r_harmonics, note, note_list, icoef_table):
     '''
     Extract beat with some weights.
     Periodic instrument( note link ) will have low weights.

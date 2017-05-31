@@ -5,6 +5,7 @@ And related to check some musical analysis.
 
 import os
 import librosa as lb
+import beatract_st_ver2 as bt2
 
 def to_wav(dir_name, save_dir, file_name):
     '''
@@ -14,7 +15,7 @@ def to_wav(dir_name, save_dir, file_name):
         save_dir - dest directory name which file_name.wav will be saved.
         file_name - to change file name. file name should not contaion "." more then 1.
     Returns:
-        nothing. save file?
+        dest_file - destination file name.
     Raises:
         file does not exist.
         directory does not exist.
@@ -28,6 +29,7 @@ def to_wav(dir_name, save_dir, file_name):
     #ffmpeg starting with full_name and wav_name
     # do system call " ffmpeg -i 'src_file' 'dest_file' "
     os.system('ffmpeg -i ' + '\'' + src_file + '\' ' + '\'' + dest_file + '\'')
+    return dest_file
 
 def MCC_with_DTW(sample, dest):
     '''
@@ -294,3 +296,36 @@ def stage_note(r_harmonics):
                     note[times][note_number].append(frequency)
     return note
 	
+def beatract(dir_name, file_name=-1, save_dir=-1):
+    '''
+    at given dir_name/file_name extract beat and save it to txt file at save to.
+    Args:
+    Return:
+    Raise:
+        nothing.
+    '''
+    dest_file = to_wav(dir_name, dir_name, file_name)
+    # if want to extract some given length, give load to duration value.
+    audio_list, sampling_rate = lb.load(dest_file, offset=0.0)
+    music = lb.cqt(audio_list, sr=sampling_rate, fmin=lb.note_to_hz('C1'), n_bins=240, \
+    bins_per_octave=12*4)
+    small_th, _ = get_threshold(music)
+    _, r_harmonic = parse_noise(music, small_th)
+    note = stage_note(r_harmonic)
+
+    _, note_list, icoef_table, _ = bt2.tie_note(note, 2)
+    weights = bt2.weightract(r_harmonic, note, note_list, icoef_table)
+    save_to(save_dir, file_name.split(".")[0] + ".txt", weights)
+
+def save_to(dir_name, file_name, weight_list):
+    '''
+    save file_name to dir_name txt file with given weights list.
+    Args:
+    Return:
+    Raise:
+        nothing.
+    '''
+    files = open(str(dir_name)+"/"+str(file_name), "w")
+    for weights in range(0, len(weight_list)):
+        files.write(str(weight_list[weights])+ "\n")
+    files.close()
