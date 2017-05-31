@@ -477,6 +477,11 @@ def append_list(note, link_table, note_list, icoef_table, length_table, time):
     append_icoef(note_list, icoef_table)
     # Append length_table at note.
     append_length(note, note_list, length_table, time)
+    # Append link_table empty...
+    # This mean Initailize which is not linked.
+    link_table.append([])
+    for _ in range(0, len(note[time+1])):
+        link_table[time+1].append([])
 
 def copy_to(dest_list, dest, src_list):
     '''
@@ -603,7 +608,7 @@ def append_length(note, note_list, length_table, time):
         # if note[time][i] and note[time+1][j] are linked, length is difference between two notes.
         length = mid(note[time][note_list[note_number][time]]) \
         - mid(note[time+1][note_list[note_number][time+1]])
-        print(str(len(length_table)) + str(len(note_list)))
+
         length_table[note_number].append(length)
 
 def append_note(link_table, note_list, icoef_table, length_table, time):
