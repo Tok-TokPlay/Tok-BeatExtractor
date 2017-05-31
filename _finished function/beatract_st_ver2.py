@@ -110,6 +110,7 @@ def tie_note(note, threshold):
 
 
     for time in range(1, len(note)-1):
+        print "Doing... : " + str(time/len(note) * 100) + " %"
 		# Stable marriagement -> link notes 1 : 1
         stable_marriagement(note[time], note[time+1], link_table, note_list, length_table, \
         time, threshold)
@@ -508,8 +509,8 @@ def append_list(note, link_table, note_list, icoef_table, length_table, time):
     append_icoef(note_list, icoef_table)
     # Append length_table at note.
     append_length(note, note_list, length_table, time)
-    print "length : " + str(length_table)
-    print "note : " + str(note_list)
+    #print "length : " + str(length_table)
+    #print "note : " + str(note_list)
     # Append link_table empty...
     # This mean Initailize which is not linked.
     link_table.append([])
@@ -876,5 +877,5 @@ def get_weights(r_harmonics, note, note_value, icoef_value, sequence):
     for note_index in range(0, len(note[sequence][note_value])):
         magnitude_sum += abs(r_harmonics[note_index][sequence])
         # abs(r_harmonics) are magnitudes.
-    weights = magnitude_sum / icoef_value
+    weights = magnitude_sum / (icoef_value+1)
     return weights

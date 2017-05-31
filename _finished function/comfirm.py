@@ -17,7 +17,7 @@ print (test_list)
 ''' 
 stage_note test code
 '''
-
+'''
 test_notes = \
 [\
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],\
@@ -61,3 +61,8 @@ for i in range(0, len(length_table)):
     print(length_table[i])
 print "========================length_table================================="
 print("Note Number = " + str(len(note_list)))
+'''
+dir_name = "/home/sshrik/Workspace/python/Music/WAV"
+file_name = "Sample0530.wav"
+save_dir = "/home/sshrik/Workspace/python/Music/WAV"
+bt.beatract(dir_name, file_name, save_dir)

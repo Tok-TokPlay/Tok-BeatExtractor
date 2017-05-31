@@ -304,18 +304,23 @@ def beatract(dir_name, file_name=-1, save_dir=-1):
     Raise:
         nothing.
     '''
+    
     dest_file = to_wav(dir_name, dir_name, file_name)
     # if want to extract some given length, give load to duration value.
     audio_list, sampling_rate = lb.load(dest_file, offset=0.0)
+    print "file opend..."
     music = lb.cqt(audio_list, sr=sampling_rate, fmin=lb.note_to_hz('C1'), n_bins=240, \
     bins_per_octave=12*4)
+    print "file CQT finished..."
     small_th, _ = get_threshold(music)
     _, r_harmonic = parse_noise(music, small_th)
+    print "file CQT harmonics extracted..."
     note = stage_note(r_harmonic)
 
     _, note_list, icoef_table, _ = bt2.tie_note(note, 2)
     weights = bt2.weightract(r_harmonic, note, note_list, icoef_table)
     save_to(save_dir, file_name.split(".")[0] + ".txt", weights)
+    print "finished extract file..."
 
 def save_to(dir_name, file_name, weight_list):
     '''
