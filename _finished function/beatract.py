@@ -6,6 +6,7 @@ And related to check some musical analysis.
 import os
 import librosa as lb
 import beatract_st_ver2 as bt2
+import matplotlib.pyplot as plt
 
 def to_wav(dir_name, save_dir, file_name):
     '''
@@ -300,7 +301,11 @@ def beatract(dir_name, file_name=-1, save_dir=-1):
     weights = bt2.weightract(r_harmonic, note, note_list, icoef_table)
     save_to(save_dir, file_name.split(".")[0] + ".txt", weights)
     print "finished extract file..."
-
+    '''
+    plt.figure()
+    plt.plot(weights)
+    plt.show()
+    '''
 def save_to(dir_name, file_name, weight_list):
     '''
     save file_name to dir_name txt file with given weights list.
