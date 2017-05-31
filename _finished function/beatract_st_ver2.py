@@ -48,10 +48,16 @@ def tie_note(note, threshold):
     note_list = []
     icoef_table = []
     length_table = []
-    #add first note to note_list
+
+    #add first note to note_list.
+    # note[0] mean at time 0, note[time]`s notes.
     for notes in range(0, len(note[0])):
+        # so append note_list notes which is list "note"`s index.
         note_list.append([])
         note_list[notes].append(notes)
+        # ... and append icoef_table note number which is 1.
+        icoef_table.append([])
+        icoef_table[notes].append(1)
 
     # link note[0] and note[1] with stable_marriagement
     append_list(note, link_table, note_list, icoef_table, length_table, 0)
@@ -558,10 +564,40 @@ def append_length(note, note_list, length_table, time):
 
 def append_note(link_table, note_list, icoef_table, length_table, time):
     '''
-
-    Args:
+    append note_list with link_table.
+    if add some instrumental, then copy it.
+    Args: link_table, note_list, icoef_table, length_table, time
+        link_table - tied notes which is related to some other note.
+            bundle of notes are other represent of instrument.
+            [ at time 0[[0], [0], [0], ... , [0], [1], [0]],
+              at time 1[[1], [1, 2], [1], ... , [1], [1, 2], [2]],
+              at time 2[[2], [1, 2], [2], ... , [2], [1, 2], [2]],
+              ...
+              at time t[[t], [t], [t], ... , [t], [t-1, t], [t]] ]
+        note_list - note list which represent instrumental.
+            [ note_list 0 [0, 0, 0, ... 0, 1, 0],
+              note_list 1 [1, 1, 1, ... 1, 1, 1],
+              note_list 2 [2, 1, 2, ... 1, 1, 2],
+              ...
+              note_list t [t, t-1, t, ... t, t-1, t] ]
+        icoef_table - inversed coefficient of notes. means, value`s number is sharing that
+            harmonics magnitude value.
+            [ coef 0 [1, 1, 1, ... 1, 3, 1],
+              coef 1 [1, 2, 1, ... 2, 3, 1],
+              coef 2 [1, 2, 1, ... 2, 3, 1],
+              ...
+              coef t [1, 1, 1, ... 1, 2, 1] ]
+        length_table - plused or minused length of note`s location.
+            [ coef 0 [4, -2, -1, ... 1, 3, 3],
+              coef 1 [-1, -2, -1, ... 2, 3, 1],
+              coef 2 [4, 4, 3, ... 2, -3, 1],
+              ...
+              coef t [2, 1, 0, ... 1, -2, -1] ]
+        time - at timing "time".
     Return:
+        nothing.
     Raise:
+        nothing.
     '''
     before_index = 0
     for index in range(0, len(link_table[time])):
@@ -590,31 +626,66 @@ def append_note(link_table, note_list, icoef_table, length_table, time):
                         copy_to(length_table, copy_number, copy_list(length_table[copy_number]))
                     del icoef_table[copy_number]
                     del length_table[copy_number]
+        for finished_note in range(0, len(note_list)):
+            if note_list[finished_note][time] == -1:
+                note_list[finished_note].append(-1)
 
-def absent_note(link_table, inde, before_index, time):
+def absent_note(link_table, index, before_index, time):
     '''
-
-    Args:
-    Return:
+    Check if there exist absetn notes.
+    Args: link_table, inde, before_index, time
+    Return: bool, start_note, finish_note
+        bool - if there absent_note, True. Else False.
+        start_note, finish_note - start and finish note number. if bool is False, -1, -1
     Raise:
+        nothing
     '''
+    if len(link_table[time][index]) != 0:
+        # if input link_table[time][index] is not null...
+        if link_table[time][index][0] - link_table[time][before_index][-1] > 1:
+            # if difference of link_table`s are larger then 2...
+            return True, link_table[time][before_index][-1], link_table[time][index][0]-1
     return False, -1, -1
 
 def add_notelist(note_list, time, index, contents):
     '''
-
-    Args:
+    add to note_list[i][time] contents if before value is index.
+    Args: note_list, time, index, contents
+        note_list - note list which represent instrumental.
+            [ note_list 0 [0, 0, 0, ... 0, 1, 0],
+              note_list 1 [1, 1, 1, ... 1, 1, 1],
+              note_list 2 [2, 1, 2, ... 1, 1, 2],
+              ...
+              note_list t [t, t-1, t, ... t, t-1, t] ]
+        time - at time "time".
+        index - before index values.
+        contents - which value to append.
     Return:
+        nothing.
     Raise:
+        nothing.
     '''
+    for note_number in range(0, len(note_list)):
+        if note_list[note_number][time] == index:
+            # if at time value is index, append contents.
+            note_list[note_number].append(contents)
 
 def capiable(note_list, time, index, copy_number):
     '''
-
-    Args:
-    Return:
+    Does note_list[copy_number][time] is copiable?
+    Which mean same as index and length is time - 1.
+    Args: note_list, time, index, copy_number
+    Return: bool
+        bool - if capiable, return True, else retur False.
     Raise:
+        nothing.
     '''
+    if note_list[copy_number][time] == index:
+        # if value is index.
+        if len(note_list[copy_number]) == time:
+            # if length is time...
+            return True
+    return False
 
 def mid(note):
     '''
