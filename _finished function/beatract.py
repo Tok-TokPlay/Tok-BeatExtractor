@@ -56,10 +56,10 @@ def MCC_with_DTW(sample, dest):
     temp = []
     for i in range(0, len(dest)):
         temp.append(dest[i] * largest_sample / largest_dest)
-        D, wp = lb.dtw(sample, temp, subseq=True)
+        dtwed, _ = lb.dtw(sample, temp, subseq=True)
 
-    # D[-1, -1] is simillarity of sounds.
-    return abs(D[-1, -1])
+    # dtwed[-1, -1] is simillarity of sounds.
+    return abs(dtwed[-1, -1])
 
 def take_local_maximum(CQT_result, threshold):
     '''
@@ -75,11 +75,11 @@ def take_local_maximum(CQT_result, threshold):
     '''
     high = []
     result = []
-    for t in range(0, len(CQT_result[0])):
-        for i in range(0, len(CQT_result)):
-            if CQT_result[i][t] > threshold:
+    for times in range(0, len(CQT_result[0])):
+        for indexes in range(0, len(CQT_result)):
+            if CQT_result[indexes][times] > threshold:
                 # i th scale at time t is larger then threshold...
-                high.append(i)
+                high.append(indexes)
                 # pick up.
         result.append(high)
         high = []
@@ -229,46 +229,9 @@ def get_scale_simmilarity(scale_set):
                 DTW_value[i].append(MCC_with_DTW(scale_list[i], scale_list[j]))
     return DTW_value
 
-def make_empty_list(a=-1, b=-1, c=-1, d=-1):
-    '''
-    take empty list dimension. -1 is not using dimension.
-    Args :
-        empty list dimension. -1 = not using ( default )
-    Returns :
-		multi dimension empty list.
-    Raises :
-		nothing
-    '''
-    result_list = []
-    # One Dimension list.
-    if a != -1 and b == -1:
-        result_list = []
-    # Two Dimension list.
-    elif b != -1 and c == -1:
-        for i1 in range(0, b):
-            result_list.append([])
-    # Three Dimension list.
-    elif c != -1 and d == -1:
-        for i1 in range(0, b):
-            result_list.append([])
-        for i1 in range(0, b):
-            for i2 in range(0, c):
-                result_list[i1].append([])
-    # Four Dimension list.
-    else:
-        for i1 in range(0, b):
-            result_list.append([])
-        for i1 in range(0, b):
-            for i2 in range(0, c):
-                result_list[i1].append([])
-        for i1 in range(0, b):
-            for i2 in range(0, c):
-                for i3 in range(0, d):
-                    result_list[i1][i2].append([])
-    # Can make it with recursive function with dimension list.
-    return result_list
 
-def make_empty_list_recursion(dimension, to_make):
+
+def make_empty_list(dimension, to_make):
     '''
     take empty list dimension with list of "dimension", make empty list, return it.
 	Args : dimension[], to_make[][]...
@@ -280,12 +243,13 @@ def make_empty_list_recursion(dimension, to_make):
         nothing.
     '''
     if len(dimension) > 1:
-        for i in range(0, dimension[-1]):
+        for dimension_number in range(0, dimension[-1]):
             to_make.append([])
-            make_empty_list_recursion(dimension[0:(len(dimension)-2)], to_make[i])
+            make_empty_list(dimension[0:(len(dimension)-1)], to_make[dimension_number])
             # Recursion part to 0 ~ len(dimension) - 2 with making empty list at to_make[i].
+        return to_make
     elif len(dimension) == 1:
-        for i in range(0, dimension[0]):
+        for _ in range(0, dimension[0]):
             to_make.append([])
         return to_make
         # if len(dimension) is one, then stop recursion and return to_make list so
@@ -303,14 +267,14 @@ def stage_note(r_harmonics):
     '''
     note = []
     # Initialize note list.
-    for t in range(0, len(r_harmonics[0])):
+    for times in range(0, len(r_harmonics[0])):
         note.append([])
         note_number = 0
         on_writing = False
         # Initialize note[] list and set on_writing to false, because start
 		# must be start with not writing.
-        for f in range(0, len(r_harmonics)):
-            if r_harmonics[f][t] == 0:
+        for frequency in range(0, len(r_harmonics)):
+            if r_harmonics[frequency][times] == 0:
                 if on_writing:
                     on_writing = False
                     note_number += 1
@@ -321,12 +285,12 @@ def stage_note(r_harmonics):
                 if on_writing:
                     # Keep writing.
                     # writing which frequency is at "note_number"`s note.
-                    note[t][note_number].append(f)
+                    note[times][note_number].append(frequency)
                 else:
                     # if note doesn't write, then turn on write flag
 					# ( on_writing ) and append list and "f".
                     on_writing = True
-                    note[t].append([])
-                    note[t][note_number].append(f)
+                    note[times].append([])
+                    note[times][note_number].append(frequency)
     return note
 	
