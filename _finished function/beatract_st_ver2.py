@@ -421,43 +421,12 @@ def append_list(note, link_table, note_list, icoef_table, length_table, time):
 	Raise:
 	    nothing
 	'''
-    # before_index means last appeared not empty list.
-    before_index = 0
-    # for all index1 of link_table[time]...
-    # This mean link_table`s all note of 
-    for i in range(0, len(link_table[time])):
-        if link_table[time][i][0] - link_table[time][before_index][-1] < 2 or i == 0:
-            if len(link_table[time][i]) == 0:
-                for j in range(0, len(note_list)):
-                    if note_list[j][time] == i:
-                        note_list[j].append(-1)
-            elif len(link_table[time][i]) == 1:
-                before_index = i
-                for j in range(0, len(note_list)):
-                    if note_list[j][time] == i:
-                        note_list[j].append(link_table[time][i][0])
-            else:
-                before_index = i
-                j = 0
-                while j < len(note_list):
-                    if note_list[j][time] == i:
-                        for l in range(0, len(link_table[time][i]-1)):
-                            copy_to(note_list, j, copy_list(note_list[j], link_table[time][i][l]))
-                            copy_to(icoef_table, j, icoef_table[j])
-                            copy_to(length_table, j, length_table[j])
-                            j += 1
-                        j += 1
-        else:
-            for k in range(link_table[time][before_index][-1]+1, link_table[time][i][0]):
-                copy_to(note_list, k, make_list(-1, time, k))
-                copy_to(icoef_table, k, make_list(0, time-1))
-                copy_to(length_table, k, make_list(0, time-1))
-
+    # Append note_list with link_table and append icoef & length too.
+    append_note(link_table, note_list, icoef_table, length_table, time)
+    # Append iceof_table with note_list.
     append_icoef(note_list, icoef_table)
+    # Append length_table at note.
     append_length(note, note_list, length_table, time)
-    link_table.append([])
-    for _ in range(0, len(link_table[time])):
-        link_table[time+1].append([])
 
 def copy_to(dest_list, dest, src_list):
     
@@ -586,6 +555,66 @@ def append_length(note, note_list, length_table, time):
         length = mid(note[time][note_list[note_number][-2]]) \
         - mid(note[time+1][note_list[note_number][-1]])
         length_table[note_number].append(length)
+
+def append_note(link_table, note_list, icoef_table, length_table, time):
+    '''
+
+    Args:
+    Return:
+    Raise:
+    '''
+    before_index = 0
+    for index in range(0, len(link_table[time])):
+        absent, start_note, finish_note = absent_note(link_table, index, before_index, time)
+        if absent:
+            before_index = index
+            for insert_number in range(start_note, finish_note):
+                copy_to(note_list, insert_number, make_list(-1, time, insert_number))
+                copy_to(icoef_table, insert_number, make_list(0, time))
+                copy_to(length_table, insert_number, make_list(0, time-1))
+        if len(link_table[time][index]) == 0:
+            add_notelist(note_list, time, index, -1)
+        elif len(link_table[time][index]) == 1:
+            before_index = index
+            add_notelist(note_list, time, index, link_table[time][index][0])
+        else:
+            before_index = index
+            for copy_number in range(0, len(note_list)):
+                if capiable(note_list, time, index, copy_number):
+                    basic = copy_list(note_list[copy_number])
+                    del note_list[copy_number]
+                    for note_num in range(0, len(link_table[time][index])):
+                        copy_to(note_list, copy_number, copy_list(basic, \
+                        trail=link_table[time][index][note_num]))
+                        copy_to(icoef_table, copy_number, copy_list(icoef_table[copy_number]))
+                        copy_to(length_table, copy_number, copy_list(length_table[copy_number]))
+                    del icoef_table[copy_number]
+                    del length_table[copy_number]
+
+def absent_note(link_table, inde, before_index, time):
+    '''
+
+    Args:
+    Return:
+    Raise:
+    '''
+    return False, -1, -1
+
+def add_notelist(note_list, time, index, contents):
+    '''
+
+    Args:
+    Return:
+    Raise:
+    '''
+
+def capiable(note_list, time, index, copy_number):
+    '''
+
+    Args:
+    Return:
+    Raise:
+    '''
 
 def mid(note):
     '''
