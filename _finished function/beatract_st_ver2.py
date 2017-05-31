@@ -114,9 +114,7 @@ def tie_note(note, threshold):
         stable_marriagement(note[time], note[time+1], link_table, note_list, length_table, \
         time, threshold)
 		# Converge -> link notes n : 1
-        print link_table[time]
         coverage(note[time], note[time+1], link_table, note_list, length_table, time, threshold)
-        print link_table[time]
 		# Seperate -> link notes 1 : n
         seperate(note[time], note[time+1], link_table, note_list, icoef_table,\
 		length_table, time, threshold)
@@ -167,9 +165,6 @@ def stable_marriagement(note_t1, note_t2, link_table, note_list, length_table, t
 
         linked, linked_i = is_linked(link_table, time, j=propose_queue[i][j])
         # delete relation with propose_queue i and j.
-        print linked
-        print str(j) + " " + str(propose_queue[i][j])
-        print link_table[time]
         if linked:
             # if already linked...
             if priority(prefer_queue, propose_queue[i][j], i) > priority(prefer_queue, \
@@ -182,7 +177,6 @@ def stable_marriagement(note_t1, note_t2, link_table, note_list, length_table, t
             make_link(link_table, time, i, propose_queue[i][j])
         # renew existance of linkable notes and i, j.
         delete_relation(propose_queue, i, propose_queue[i][j])
-        print link_table[time]
         free, i, j = is_free_note(propose_queue, link_table, time)
 
 def make_queue(note_t1, note_t2, length_table, note_list, difference, threshold, time):
@@ -513,7 +507,6 @@ def append_list(note, link_table, note_list, icoef_table, length_table, time):
     # Append iceof_table with note_list.
     append_icoef(note_list, icoef_table)
     # Append length_table at note.
-    print time
     append_length(note, note_list, length_table, time)
     print "length : " + str(length_table)
     print "note : " + str(note_list)
@@ -613,7 +606,7 @@ def append_icoef(note_list, icoef_list):
     recorded_number = 0
 
     while coef_number < len(note_list)-1:
-        if note_list[coef_number][-1] == -1 :
+        if note_list[coef_number][-1] == -1:
             for _ in range(0, same_number):
                 icoef_list[recorded_number].append(0)
                 recorded_number += 1
