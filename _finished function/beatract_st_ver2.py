@@ -85,7 +85,7 @@ def tie_note(note, threshold):
     # j is value related to i.
     free, i, j = is_free_note(propose_queue, link_table, 0)
 
-    while not free:
+    while free:
         # if there exiest some linkable values...
         linked, linked_i = is_linked(link_table, 0, j=propose_queue[i][j])
         delete_relation(propose_queue, i, j)
@@ -154,7 +154,7 @@ def stable_marriagement(note_t1, note_t2, link_table, length_table, time, thresh
     # j is value related to i.
     free, i, j = is_free_note(propose_queue, link_table, time)
 
-    while not free:
+    while free:
         # if there exiest some linkable values...
         linked, linked_i = is_linked(link_table, time, j=propose_queue[i][j])
         delete_relation(propose_queue, i, j)
