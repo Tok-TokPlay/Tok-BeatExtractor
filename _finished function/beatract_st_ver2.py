@@ -709,7 +709,7 @@ def append_note(link_table, note_list, icoef_table, length_table, time):
                     del icoef_table[copy_number]
                     del length_table[copy_number]
         for finished_note in range(0, len(note_list)):
-            if len(note_list[finished_note]) == time and note_list[finished_note][-1] == -1:
+            if len(note_list[finished_note]) == time + 1 and note_list[finished_note][-1] == -1:
                 note_list[finished_note].append(-1)
 
 def absent_note(link_table, index, before_index, time):
