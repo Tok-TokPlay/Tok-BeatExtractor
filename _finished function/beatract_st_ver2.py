@@ -88,18 +88,18 @@ def tie_note(note, threshold):
     while free:
         # if there exiest some linkable values...
         linked, linked_i = is_linked(link_table, 0, j=propose_queue[i][j])
-        delete_relation(propose_queue, i, j)
         # delete relation with propose_queue i and j.
         if linked:
             # if already linked...
             if priority(prefer_queue, j, i) > priority(prefer_queue, j, linked_i):
                 # if priority is highter, then delete that link and link with new i.
-                delete_link(link_table, 0, linked_i, j)
-                make_link(link_table, 0, i, j)
+                delete_link(link_table, 0, linked_i, propose_queue[i][j])
+                make_link(link_table, 0, i, propose_queue[i][j])
         else:
             # if not linked, just link.
-            make_link(link_table, 0, i, j)
+            make_link(link_table, 0, i, propose_queue[i][j])
         # renew existance of linkable notes and i, j.
+        delete_relation(propose_queue, i, propose_queue[i][j])
         free, i, j = is_free_note(propose_queue, link_table, 0)
 
     ########################## Stable Marriagement #############################################
@@ -156,19 +156,22 @@ def stable_marriagement(note_t1, note_t2, link_table, length_table, time, thresh
 
     while free:
         # if there exiest some linkable values...
+        print "At time : " + str(time)
+        print "link_table : " + str(link_table)
+        print "length_table : " + str(length_table)
         linked, linked_i = is_linked(link_table, time, j=propose_queue[i][j])
-        delete_relation(propose_queue, i, j)
         # delete relation with propose_queue i and j.
         if linked:
             # if already linked...
             if priority(prefer_queue, j, i) > priority(prefer_queue, j, linked_i):
                 # if priority is highter, then delete that link and link with new i.
-                delete_link(link_table, time, linked_i, j)
-                make_link(link_table, time, i, j)
+                delete_link(link_table, time, linked_i, propose_queue[i][j])
+                make_link(link_table, time, i, propose_queue[i][j])
         else:
             # if not linked, just link.
-            make_link(link_table, time, i, j)
+            make_link(link_table, time, i, propose_queue[i][j])
         # renew existance of linkable notes and i, j.
+        delete_relation(propose_queue, i, propose_queue[i][j])
         free, i, j = is_free_note(propose_queue, link_table, time)
 
 def make_queue(note_t1, note_t2, length_table, difference, threshold, time):
@@ -258,13 +261,20 @@ def is_free_note(propose_queue, link_table, time):
             # if link_table[time][link_number] is not linked... with len == 0...
             if len(propose_queue[link_number]) != 0:
                 # if propose_queue is note empty.
-                return True, link_number, propose_queue[link_number][0]
+                return True, link_number, 0
     return False, -1, -1
 
 def is_linked(link_table, time, i=-1, j=-1):
     '''
     Check if given i or j is linked in link_table, and return which is linked.
     Args: i, j, link_table
+    link_table - tied notes which is related to some other note.
+            bundle of notes are other represent of instrument.
+            [ at time 0[[0], [0], [0], ... , [0], [1], [0]],
+              at time 1[[1], [1, 2], [1], ... , [1], [1, 2], [2]],
+              at time 2[[2], [1, 2], [2], ... , [2], [1, 2], [2]],
+              ...
+              at time t[[t], [t], [t], ... , [t], [t-1, t], [t]] ]
     Return: linked, linked_i
         linked - if given i or j are linked with some notes, return True, else return False.
         linked_i - if linked == True, return linked note`s list "note"`s index.( value )
@@ -274,12 +284,12 @@ def is_linked(link_table, time, i=-1, j=-1):
     '''
     if i != -1:
         if len(link_table[time][i]) != 0:
-            return True, link_table[time][i][0]
+            return True, link_table[time][i]
         else:
             return False, -1
     elif j != -1:
         for t1_number in range(0, len(link_table[time])):
-            if link_table[time][t1_number][0] == j:
+            if link_table[time][t1_number] == j:
                 return True, t1_number
         return False, -1
 
@@ -364,12 +374,18 @@ def coverage(note_t1, note_t2, link_table, length_table, time, threshold):
         linked, _ = is_linked(link_table, time, i=note_number1)
         if not linked:
             # if not linked note_number1,
-            for note_number2 in range(0, len(note_t2)):
-                # if time"time"`s note_number1 and time "time+1"`s note_number2 are linkable...
-                if acceptable_note(length_table, difference, note_number1,\
-                note_number2, time, threshold):
-                    make_link(link_table, time, note_number1, note_number2)
-                    break
+            note_number2 = get_smallest_index(note_number1, difference)
+            make_link(link_table, time, note_number1, note_number2)
+
+def get_smallest_index(note_number1, difference):
+    '''
+    get smallest index of difference[note_number1]`s list.
+    '''
+    smallest_index = 0
+    for note_number2 in range(0, len(difference[note_number1])):
+        if difference[note_number1][note_number2] < difference[note_number1][smallest_index]:
+            smallest_index = note_number2
+    return smallest_index
 
 def acceptable_note(length_table, difference, i, j, time, threshold):
     '''
@@ -431,7 +447,7 @@ def calc_icoef(icoef_table, note_list, time, note_list_number):
     # Return icoef value of table which note number is "note_list_number" and at time.
     for note_number in range(0, len(note_list)):
         if note_list[note_number][time] == note_list_number:
-            return [note_number][time]
+            return note_list[note_number][time]
 
 def append_list(note, link_table, note_list, icoef_table, length_table, time):
     '''
