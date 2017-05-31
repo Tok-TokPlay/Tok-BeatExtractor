@@ -145,9 +145,10 @@ def stable_marriagement(note_t1, note_t2, link_table, length_table, time, thresh
 	Raise:
 	    nothing
 	'''
-    difference = distance(note_t1, note_t2)
-    propose_queue = make_queue(note_t1, note_t2, length_table, difference, threshold, time)
-    prefer_queue = make_queue(note_t2, note_t1, length_table, difference, threshold, time)
+    difference1 = distance(note_t1, note_t2)
+    difference2 = distance(note_t2, note_t1)
+    propose_queue = make_queue(note_t1, note_t2, length_table, difference1, threshold, time)
+    prefer_queue = make_queue(note_t2, note_t1, length_table, difference2, threshold, time)
 
     # i is index and value as same time.
     # j is value related to i.
@@ -691,11 +692,12 @@ def absent_note(link_table, index, before_index, time):
     Raise:
         nothing
     '''
-    if len(link_table[time][index]) != 0:
-        # if input link_table[time][index] is not null...
-        if link_table[time][index][0] - link_table[time][before_index][-1] > 1:
-            # if difference of link_table`s are larger then 2...
-            return True, link_table[time][before_index][-1], link_table[time][index][0]-1
+    if len(link_table[time][index]) != 0 and index != before_index:
+        if len(link_table[time][before_index]) != 0:
+            # if input link_table[time][index] is not null...
+            if link_table[time][index][0] - link_table[time][before_index][-1] > 1:
+                # if difference of link_table`s are larger then 2...
+                return True, link_table[time][before_index][-1], link_table[time][index][0]-1
     return False, -1, -1
 
 def add_notelist(note_list, time, index, contents):
@@ -754,7 +756,7 @@ def mid(note):
     # just return average of note`s contents.
     return average / len(note)
 
-def distance(time1, time2):
+def distance(note_t1, note_t2):
     '''
     compare note1 and note2 then return some distance of 2 notes.
     Args : time1, time2
@@ -766,13 +768,14 @@ def distance(time1, time2):
     '''
     difference = []
     # initialize return value "difference" with empty list
-    for i in range(0, len(time1)):
+    for note_number1 in range(0, len(note_t1)):
         difference.append([])
         # add empty list to difference to show i`th time1 notes and all time2 notes.
-        for j in range(0, len(time2)):
+        for note_number2 in range(0, len(note_t2)):
             # add difference of time1[i] and time2[j]
             # just uclidean distance of two note`s average.
-            difference[i].append(abs(mid(time1[i]) - mid(time2[j])))
+            difference[note_number1].append(abs(mid(note_t1[note_number1]) - \
+            mid(note_t2[note_number2])))
     return difference
 
 def beatract(r_harmonics, note, note_list, icoef_table):
