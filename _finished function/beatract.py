@@ -296,7 +296,7 @@ def beatract(dir_name, file_name=-1, save_dir=-1):
     print "file CQT harmonics extracted..."
     note = stage_note(r_harmonic)
 
-    _, note_list, icoef_table, _ = bt2.tie_note(note, 2)
+    _, note_list, icoef_table, _ = bt2.tie_note(note, 8)
     weights = bt2.weightract(r_harmonic, note, note_list, icoef_table)
     save_to(save_dir, file_name.split(".")[0] + ".txt", weights)
     print "finished extract file..."

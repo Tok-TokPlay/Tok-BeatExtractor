@@ -236,6 +236,10 @@ def get_length(length_table, note_list, time, i):
     '''
     # take all value in length_table`s time-1`s i th note`s length.
     for note_number in range(0, len(note_list)):
+        if len(note_list[note_number]) == time:
+            print "at time : " + str(time)
+            print note_list[note_number]
+            print len(note_list[note_number])
         if note_list[note_number][time] == i:
             return length_table[note_number][time-1]
     return -1
@@ -293,7 +297,7 @@ def is_linked(link_table, time, i=-1, j=-1):
     '''
     if i != -1:
         if len(link_table[time][i]) != 0:
-            return True, link_table[time][i]
+            return True, link_table[time][i][0]
         else:
             return False, -1
     elif j != -1:
@@ -829,9 +833,10 @@ def weightract(r_harmonics, note, note_list, icoef_table):
         for sequence in range(0, len(note_list[note_number])):
             # Weights are weights value / coef * periodicality.
             weights[note_number].append(\
-            get_weights(r_harmonics, note, note_list[note_number][sequence],\
-            icoef_table[note_number][sequence], sequence) * periodic[note_number])
-
+            get_weights(r_harmonics, note, note_list[note_number][sequence], \
+            icoef_table[note_number][sequence], sequence))
+            #get_weights(r_harmonics, note, note_list[note_number][sequence],\
+            #icoef_table[note_number][sequence], sequence) * periodic[note_number])
     real_beat = []
     # Add all beat weights.
     for note_number2 in range(0, len(weights[0])):
@@ -839,6 +844,7 @@ def weightract(r_harmonics, note, note_list, icoef_table):
         for note_number1 in range(0, len(weights)):
             _sum += weights[note_number1][note_number2]
         real_beat.append(_sum)
+
     return real_beat
 
 def get_periodic(note_t1):
@@ -875,7 +881,7 @@ def get_weights(r_harmonics, note, note_value, icoef_value, sequence):
     magnitude_sum = 0
     # Add all magnitudes for at all value in note[time][note_value]
     for note_index in range(0, len(note[sequence][note_value])):
-        magnitude_sum += abs(r_harmonics[note_index][sequence])
+        magnitude_sum += abs(r_harmonics[note[sequence][note_value][note_index]][sequence])
         # abs(r_harmonics) are magnitudes.
-    weights = magnitude_sum / (icoef_value+1)
-    return weights
+        # weights = magnitude_sum / (icoef_value+1)
+    return magnitude_sum
