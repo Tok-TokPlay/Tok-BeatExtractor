@@ -639,8 +639,8 @@ def append_length(note, note_list, length_table, time):
     # for all range of note_list...
     for note_number in range(0, len(note_list)):
         # if note[time][i] and note[time+1][j] are linked, length is difference between two notes.
-        length = mid(note[time-1][note_list[note_number][time-1]]) \
-        - mid(note[time][note_list[note_number][time]])
+        length = mid(note[time][note_list[note_number][time]]) \
+        - mid(note[time+1][note_list[note_number][time+1]])
 
         length_table[note_number].append(length)
 
