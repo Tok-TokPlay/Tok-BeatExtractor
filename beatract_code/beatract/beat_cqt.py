@@ -38,37 +38,7 @@ def to_wav(dir_name, save_dir, file_name, addable_option="-n"):
 
     return dest_file
 
-def MCC_with_DTW(sample, dest):
-    '''
-    This function check simillarity of sound between sample and dest.
-    Ignoring magnitude between sample and dest.
-    Args : sample, dest
-        sample - sound to compare.
-        dest - sound to compare.
-    Returns:
-        simillarity of sample and dest.
-    Raises:
-        nothing.
-    '''
-    # MCC : Magnitude Control Compare.
-    largest_sample = 0.000000001
-    for i in range(0, len(sample)):
-        if largest_sample < sample[i]:
-            largest_sample = sample[i]
 
-    largest_dest = 0.000000001
-    for i in range(0, len(dest)):
-        if largest_dest < dest[i]:
-            largest_dest = dest[i]
-
-    # Comapre largest value and multiply to one.
-    temp = []
-    for i in range(0, len(dest)):
-        temp.append(dest[i] * largest_sample / largest_dest)
-        dtwed, _ = lb.dtw(sample, temp, subseq=True)
-
-    # dtwed[-1, -1] is simillarity of sounds.
-    return abs(dtwed[-1, -1])
 
 def take_local_maximum(CQT_result, threshold):
     '''
@@ -213,7 +183,7 @@ def get_scale_simmilarity(scale_set):
         for j in range(0, len(scale_list)):
             if j < i:
                 DTW_value[i].append(DTW_value[j][i])
-            else: 
+            else:
                 DTW_value[i].append(MCC_with_DTW(scale_list[i], scale_list[j]))
     return DTW_value
 
