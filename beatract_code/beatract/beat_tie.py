@@ -383,17 +383,18 @@ def coverage(note_t1, note_t2, link_table, note_list, length_table, time, thresh
     for note_number1 in range(0, len(note_t1)):
         linked, _ = is_linked(link_table, time, i=note_number1)
         if not linked:
-            # if not linked note_number1,
+            # if not linked note_number1
             note_number2 = get_smallest_index(note_number1, difference)
-            if difference[note_number1][note_number2] < get_length(length_table, note_list, time, \
-            note_number1) + threshold:
-                make_link(link_table, time, note_number1, note_number2)
+            if note_number2 != -1:
+                if difference[note_number1][note_number2] < get_length(length_table, \
+                note_list, time, note_number1) + threshold:
+                    make_link(link_table, time, note_number1, note_number2)
 
 def get_smallest_index(note_number1, difference):
     '''
     get smallest index of difference[note_number1]`s list.
     '''
-    smallest_index = 0
+    smallest_index = -1
     for note_number2 in range(0, len(difference[note_number1])):
         if difference[note_number1][note_number2] < difference[note_number1][smallest_index]:
             smallest_index = note_number2
@@ -690,7 +691,7 @@ def append_note(link_table, note_list, icoef_table, length_table, time):
             before_index = index
             for insert_number in range(start_note, finish_note):
                 copy_to(note_list, insert_number, make_list(-1, time + 1, insert_number + 1))
-                copy_to(icoef_table, insert_number, make_list(0, time))
+                copy_to(icoef_table, insert_number, make_list(0, time + 1))
                 copy_to(length_table, insert_number, make_list(0, time - 1))
         if len(link_table[time][index]) == 0:
             add_notelist(note_list, time, index, -1)
@@ -832,11 +833,11 @@ def weightract(r_harmonics, note, note_list, icoef_table):
     weights = []
     for note_number in range(0, len(note_list)):
         weights.append([])
-        for sequence in range(0, len(note_list[note_number])):
+        for time in range(0, len(note_list[note_number])):
             # Weights are weights value / coef * periodicality.
             weights[note_number].append(\
-            get_weights(r_harmonics, note, note_list[note_number][sequence], \
-            icoef_table[note_number][sequence], sequence))
+            get_weights(r_harmonics, note, note_list[note_number][time], \
+            icoef_table[note_number][time], time))
             #get_weights(r_harmonics, note, note_list[note_number][sequence],\
             #icoef_table[note_number][sequence], sequence) * periodic[note_number])
     real_beat = []
@@ -869,7 +870,7 @@ def get_periodic(note_t1):
 
     return empty_number / len(note_t1)
 
-def get_weights(r_harmonics, note, note_value, icoef_value, sequence):
+def get_weights(r_harmonics, note, note_value, icoef_value, time):
     '''
     get weights of note`s with note_value and icoef_value.
     if icoef_value is large, weights are small.
@@ -882,8 +883,9 @@ def get_weights(r_harmonics, note, note_value, icoef_value, sequence):
     '''
     magnitude_sum = 0
     # Add all magnitudes for at all value in note[time][note_value]
-    for note_index in range(0, len(note[sequence][note_value])):
-        magnitude_sum += abs(r_harmonics[note[sequence][note_value][note_index]][sequence])
-        # abs(r_harmonics) are magnitudes.
-        # weights = magnitude_sum / (icoef_value+1)
+    if len(note[time]) != 0:
+        for note_index in range(0, len(note[time][note_value])):
+            magnitude_sum += abs(r_harmonics[note[time][note_value][note_index]][time])
+            # abs(r_harmonics) are magnitudes.
+            # weights = magnitude_sum / (icoef_value+1)
     return magnitude_sum

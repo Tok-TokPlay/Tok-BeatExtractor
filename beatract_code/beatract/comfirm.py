@@ -62,7 +62,7 @@ for i in range(0, len(length_table)):
 print "========================length_table================================="
 print("Note Number = " + str(len(note_list)))
 '''
-dir_name = "/home/sshrik/Workspace/python/Music/WAV"
-file_name = "Ordinary Life.wav"
-save_dir = "/home/sshrik/Workspace/python/Music/WAV"
-bt.beatract(dir_name, file_name, save_dir)
+dir_name = "/home/sshrik/Workspace/python/Regacy of void/WAV_CUT"
+file_name = "I Love You2.wav"
+#save_dir = "/home/sshrik/Workspace/python/Music/WAV"
+bt.beatract(dir_name=dir_name, file_name=file_name, show_graph=1)
