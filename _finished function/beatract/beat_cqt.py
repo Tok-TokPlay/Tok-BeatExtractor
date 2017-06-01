@@ -5,7 +5,7 @@ And related to check some musical analysis.
 
 import os
 import librosa as lb
-import beatract_st_ver2 as bt2
+import beat_tie as bt2
 import matplotlib.pyplot as plt
 
 def to_wav(dir_name, save_dir, file_name):
