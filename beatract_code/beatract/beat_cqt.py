@@ -8,13 +8,14 @@ import librosa as lb
 import beat_tie as bt2
 import matplotlib.pyplot as plt
 
-def to_wav(dir_name, save_dir, file_name):
+def to_wav(dir_name, save_dir, file_name, addable_option="-n"):
     '''
     Change any file to wav file to calculate well.
     Args : dir_name, save_dir, file_name
         dir_name - src directory name which file_name is in.
         save_dir - dest directory name which file_name.wav will be saved.
         file_name - to change file name. file name should not contaion "." more then 1.
+        addable_option - "-y" or "-n" to yes / No.
     Returns:
         dest_file - destination file name.
     Raises:
@@ -29,7 +30,8 @@ def to_wav(dir_name, save_dir, file_name):
 
     #ffmpeg starting with full_name and wav_name
     # do system call " ffmpeg -i 'src_file' 'dest_file' "
-    os.system('ffmpeg -i ' + '\'' + src_file + '\' ' + '\'' + dest_file + '\'')
+    os.system('ffmpeg ' + addable_option + ' -i ' +\
+    '\'' + src_file + '\' ' + '\'' + dest_file + '\'')
     return dest_file
 
 def MCC_with_DTW(sample, dest):
@@ -276,7 +278,8 @@ def stage_note(r_harmonics):
                     note[times][note_number].append(frequency)
     return note
 
-def beatract(dir_name, file_name=-1, save_dir=-1):
+def beatract(dir_name, file_name=-1, save_dir=-1, addable_option="-n", \
+specific=4, threshold_length=8, show_graph=-1):
     '''
     at given dir_name/file_name extract beat and save it to txt file at save to.
     Args:
@@ -284,28 +287,44 @@ def beatract(dir_name, file_name=-1, save_dir=-1):
     Raise:
         nothing.
     '''
+    # if file_name is default value, check all file in directory.
+    if file_name == -1:
+        file_names = os.listdir(dir_name)
+    else:
+        file_names = [file_name]
 
-    dest_file = to_wav(dir_name, dir_name, file_name)
-    # if want to extract some given length, give load to duration value.
-    audio_list, sampling_rate = lb.load(dest_file, offset=0.0)
-    print "file opend..."
-    music = lb.cqt(audio_list, sr=sampling_rate, fmin=lb.note_to_hz('C1'), n_bins=240, \
-    bins_per_octave=12*4)
-    print "file CQT finished..."
-    threshold = get_threshold(music)
-    _, r_harmonic = parse_noise(music, threshold)
-    print "file CQT harmonics extracted..."
-    note = stage_note(r_harmonic)
+    # if save_dir is default value, save_dir is in source directory.
+    if save_dir == -1:
+        save_dir = dir_name
 
-    _, note_list, icoef_table, _ = bt2.tie_note(note, 8)
-    weights = bt2.weightract(r_harmonic, note, note_list, icoef_table)
-    save_to(save_dir, file_name.split(".")[0] + ".txt", weights)
-    print "finished extract file..."
-    '''
-    plt.figure()
-    plt.plot(weights)
-    plt.show()
-    '''
+    # now is now beat extracting number.
+    now = 0
+    for file_name in file_names:
+        now += 1
+        print "Strat extracting " + file_name + "... Now " + str(now) + " / "+  str(len(file_names))
+
+        dest_file = to_wav(dir_name, dir_name, file_name, addable_option)
+        # if want to extract some given length, give load to duration value.
+        audio_list, sampling_rate = lb.load(dest_file, offset=0.0)
+        print "file opend..."
+        music = lb.cqt(audio_list, sr=sampling_rate, fmin=lb.note_to_hz('C1'), n_bins=60*specific, \
+        bins_per_octave=12*specific)
+        print "file CQT finished..."
+        threshold = get_threshold(music)
+        _, r_harmonic = parse_noise(music, threshold)
+        print "file CQT harmonics extracted..."
+        note = stage_note(r_harmonic)
+
+        _, note_list, icoef_table, _ = bt2.tie_note(note, threshold_length)
+        weights = bt2.weightract(r_harmonic, note, note_list, icoef_table)
+        save_to(save_dir, file_name.split(".")[0] + ".txt", weights)
+        print "finished extract file..."
+
+        if show_graph != -1:
+            plt.figure()
+            plt.plot(weights)
+            plt.show()
+
 def save_to(dir_name, file_name, weight_list):
     '''
     save file_name to dir_name txt file with given weights list.
