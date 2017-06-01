@@ -236,12 +236,8 @@ def get_length(length_table, note_list, time, i):
     '''
     # take all value in length_table`s time-1`s i th note`s length.
     for note_number in range(0, len(note_list)):
-        if len(note_list[note_number]) == time:
-            print "at time : " + str(time)
-            print note_list[note_number]
-            print len(note_list[note_number])
         if note_list[note_number][time] == i:
-            return length_table[note_number][time-1]
+            return length_table[note_number][time-2]
     return -1
 
 def is_free_note(propose_queue, link_table, time):
@@ -464,7 +460,7 @@ def calc_icoef(icoef_table, note_list, time, note_list_number):
     # Return icoef value of table which note number is "note_list_number" and at time.
     for note_number in range(0, len(note_list)):
         if note_list[note_number][time] == note_list_number:
-            return icoef_table[note_number][time]
+            return icoef_table[note_number][time-1]
 
 def append_list(note, link_table, note_list, icoef_table, length_table, time):
     '''
@@ -639,10 +635,12 @@ def append_length(note, note_list, length_table, time):
     # for all range of note_list...
     for note_number in range(0, len(note_list)):
         # if note[time][i] and note[time+1][j] are linked, length is difference between two notes.
-        length = mid(note[time][note_list[note_number][time]]) \
-        - mid(note[time+1][note_list[note_number][time+1]])
-
-        length_table[note_number].append(length)
+        if note_list[note_number][time + 1] == -1:
+            length_table[note_number].append(0)
+        else:
+            length = mid(note[time][note_list[note_number][time]]) \
+            - mid(note[time+1][note_list[note_number][time+1]])
+            length_table[note_number].append(length)
 
 def append_note(link_table, note_list, icoef_table, length_table, time):
     '''
@@ -688,8 +686,8 @@ def append_note(link_table, note_list, icoef_table, length_table, time):
             before_index = index
             for insert_number in range(start_note, finish_note):
                 copy_to(note_list, insert_number, make_list(-1, time + 1, insert_number + 1))
-                copy_to(icoef_table, insert_number, make_list(0, time + 1))
-                copy_to(length_table, insert_number, make_list(0, time))
+                copy_to(icoef_table, insert_number, make_list(0, time))
+                copy_to(length_table, insert_number, make_list(0, time - 1))
         if len(link_table[time][index]) == 0:
             add_notelist(note_list, time, index, -1)
         elif len(link_table[time][index]) == 1:
