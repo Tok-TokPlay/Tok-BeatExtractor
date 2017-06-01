@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 def to_wav(dir_name, save_dir, file_name, addable_option="-n"):
     '''
     Change any file to wav file to calculate well.
+    if wav, doesn't process.
     Args : dir_name, save_dir, file_name
         dir_name - src directory name which file_name is in.
         save_dir - dest directory name which file_name.wav will be saved.
@@ -25,13 +26,16 @@ def to_wav(dir_name, save_dir, file_name, addable_option="-n"):
     '''
     # src name : dir_name + file_name + .mp3, .wmv etc...
     # dest name : save_dir + file_name + .wav
-    src_file = dir_name + "/"  + file_name
-    dest_file = save_dir + "/" + file_name.split(".")[0] + ".wav"
 
-    #ffmpeg starting with full_name and wav_name
-    # do system call " ffmpeg -i 'src_file' 'dest_file' "
-    os.system('ffmpeg ' + addable_option + ' -i ' +\
-    '\'' + src_file + '\' ' + '\'' + dest_file + '\'')
+    if file_name.split(".")[-1] != "wav":
+        src_file = dir_name + "/"  + file_name
+        dest_file = save_dir + "/" + file_name.split(".")[0] + ".wav"
+
+        #ffmpeg starting with full_name and wav_name
+        # do system call " ffmpeg -i 'src_file' 'dest_file' "
+        os.system('ffmpeg ' + addable_option + ' -i ' +\
+        '\'' + src_file + '\' ' + '\'' + dest_file + '\'')
+
     return dest_file
 
 def MCC_with_DTW(sample, dest):
