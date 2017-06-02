@@ -889,3 +889,41 @@ def get_weights(r_harmonics, note, note_value, icoef_value, time):
             # abs(r_harmonics) are magnitudes.
             # weights = magnitude_sum / (icoef_value+1)
     return magnitude_sum
+
+def average_note_list(weight_t1):
+    '''
+    calculate weight_t1`s average magnitude.
+    '''
+
+def note_length(note_t1):
+    '''
+    '''
+
+def length_normalize(link_table, note_list, icoef_table, length_table, time):
+    '''
+    Normalize 4 list with time domain.
+    For all notes number, we check if len(list) is correct time and if larger or smaller, append or delete
+        apropriate notes / icoef / length
+    Args: link_table, note_list, icoef_table, length_table
+        link_table -
+        note_list -
+        icoef_table -
+        length_table -
+    Return:
+        nothing.
+    Raises:
+        nohting.
+    '''
+
+def icoef_recalculation(note_list, icoef_table):
+    '''
+    Recalculation icoef_table with calculated note_list.
+    Confirm icoef can mean note_list`s sharing note`s information.
+    Args: note_list, icoef_table
+        note_list -
+        icoef_table -
+    Return:
+        nothing.
+    Raises:
+        nohting.
+    '''

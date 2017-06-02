@@ -35,14 +35,16 @@ def to_wav(dir_name, save_dir, file_name, addable_option="-n"):
         # do system call " ffmpeg -i 'src_file' 'dest_file' "
         os.system('ffmpeg ' + addable_option + ' -i ' +\
         '\'' + src_file + '\' ' + '\'' + dest_file + '\'')
+        return dest_file
+    else:
+        src_file = save_dir + "/"  + file_name
+        return src_file
 
-    return dest_file
 
-
-
-def take_local_maximum(CQT_result, threshold):
+def take_local_maximum(two_dimension_list, threshold):
     '''
     Take local Maximum value range bigger then threshold.
+    Just cut values threshold * 100 with increase order.
     Args : CQT_result, threshold
         CQT_result : which picked up bigger then threshold.
         threshold : standard of picking value at CQT_result.
@@ -54,9 +56,9 @@ def take_local_maximum(CQT_result, threshold):
     '''
     high = []
     result = []
-    for times in range(0, len(CQT_result[0])):
-        for indexes in range(0, len(CQT_result)):
-            if CQT_result[indexes][times] > threshold:
+    for times in range(0, len(two_dimension_list[0])):
+        for indexes in range(0, len(two_dimension_list)):
+            if two_dimension_list[indexes][times] > threshold:
                 # i th scale at time t is larger then threshold...
                 high.append(indexes)
                 # pick up.
