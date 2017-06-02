@@ -165,32 +165,6 @@ def get_scale(CQT_harmonic):
                     temp.append(CQT_harmonic[f][t])
     return scale_set, time_set
 
-def get_scale_simmilarity(scale_set):
-    '''
-    take scale and calculate simmilarity with DTW of each scale set.
-    Args : scale_set ( list )
-		scale_set - set of values which magnitude over threshold. ( Real Note of music. )
-	Returns : DTW_value.
-		DTW_value -
-	Raises :
-		nothing
-    '''
-    scale_list = []
-    DTW_value = []
-    for f in range(0, len(scale_set)):
-        for t in range(0, len(scale_set[f])):
-            scale_list.append(scale_set[f][t])
-            DTW_value.append([])
-    for i in range(0, len(scale_list)):
-        for j in range(0, len(scale_list)):
-            if j < i:
-                DTW_value[i].append(DTW_value[j][i])
-            else:
-                DTW_value[i].append(MCC_with_DTW(scale_list[i], scale_list[j]))
-    return DTW_value
-
-
-
 def make_empty_list(dimension, to_make):
     '''
     take empty list dimension with list of "dimension", make empty list, return it.
