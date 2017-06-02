@@ -255,7 +255,7 @@ def stage_note(r_harmonics):
     return note
 
 def beatract(dir_name, file_name=-1, save_dir=-1, addable_option="-n", \
-specific=4, threshold_length=8, show_graph=-1):
+specific=4, threshold_length=8, show_graph=-1, save_graph=-1):
     '''
     at given dir_name/file_name extract beat and save it to txt file at save to.
     Args:
@@ -282,24 +282,29 @@ specific=4, threshold_length=8, show_graph=-1):
         dest_file = to_wav(dir_name, dir_name, file_name, addable_option)
         # if want to extract some given length, give load to duration value.
         audio_list, sampling_rate = lb.load(dest_file, offset=0.0)
-        print "file opend..."
+        print "file opend..." + "... Now " + str(now) + " / "+  str(len(file_names))
         music = lb.cqt(audio_list, sr=sampling_rate, fmin=lb.note_to_hz('C1'), n_bins=60*specific, \
         bins_per_octave=12*specific)
-        print "file CQT finished..."
+
+        print "file CQT finished..." + "... Now " + str(now) + " / "+  str(len(file_names))
         threshold = get_threshold(music)
         _, r_harmonic = parse_noise(music, threshold)
-        print "file CQT harmonics extracted..."
+
+        print "file CQT harmonics extracted..." + "... Now " + str(now) + " / " + \
+        str(len(file_names))
         note = stage_note(r_harmonic)
 
         _, note_list, icoef_table, _ = bt2.tie_note(note, threshold_length)
         weights = bt2.weightract(r_harmonic, note, note_list, icoef_table)
         save_to(save_dir, file_name.split(".")[0] + ".txt", weights)
-        print "finished extract file..."
+        print "finished extract file..." + "... Now " + str(now) + " / "+  str(len(file_names))
 
         if show_graph != -1:
             plt.figure()
             plt.plot(weights)
             plt.show()
+        if save_graph != -1:
+            plt.savefig(str(dir_name)+"/"+str(file_name.split(".")[0] + ".png"))
 
 def save_to(dir_name, file_name, weight_list):
     '''

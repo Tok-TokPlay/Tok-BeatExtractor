@@ -65,4 +65,4 @@ print("Note Number = " + str(len(note_list)))
 dir_name = "/home/sshrik/Workspace/python/Regacy of void/WAV_CUT"
 
 #save_dir = "/home/sshrik/Workspace/python/Music/WAV"
-bt.beatract(dir_name=dir_name,file_name=-1, show_graph=-1)
+bt.beatract(dir_name=dir_name,file_name=-1, show_graph=-1, save_graph=1)

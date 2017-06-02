@@ -110,7 +110,7 @@ def tie_note(note, threshold):
 
 
     for time in range(1, len(note)-1):
-        print "Doing... : " + str(time) + " / " + str(len(note))
+        # print "Doing... : " + str(time) + " / " + str(len(note))
 		# Stable marriagement -> link notes 1 : 1
         stable_marriagement(note[time], note[time+1], link_table, note_list, length_table, \
         time, threshold)
