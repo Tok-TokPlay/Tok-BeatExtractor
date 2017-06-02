@@ -278,6 +278,8 @@ specific=4, threshold_length=8, show_graph=-1, save_graph=-1):
             plt.plot(weights)
             plt.show()
         if save_graph != -1:
+            plt.figure()
+            plt.plot(weights)
             plt.savefig(str(dir_name)+"/"+str(file_name.split(".")[0] + ".png"))
 
 def save_to(dir_name, file_name, weight_list):
