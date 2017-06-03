@@ -893,11 +893,21 @@ def get_weights(r_harmonics, note, note_value, icoef_value, time):
 def average_note_list(weight_t1):
     '''
     calculate weight_t1`s average magnitude.
-    Args:
-    Return:
+    Args: weight_t1
+        weight_t1 - weight list for time1.
+    Return: average
+        average - average of weight list.
+            This value will be used to lank
     Raises:
         nothing.
     '''
+    average = 0
+    dispersion = 0
+    for length in range(0, len(weight_t1)):
+        average += weight_t1[length]
+    for length in range(0, len(weight_t1)):
+        dispersion += weight_t1[length]
+    return average / len(weight_t1)
 
 def note_length(note_t1):
     '''
@@ -911,8 +921,8 @@ def note_length(note_t1):
 def length_normalize(link_table, note_list, icoef_table, length_table, time):
     '''
     Normalize 4 list with time domain.
-    For all notes number, we check if len(list) is correct time and if larger or smaller, append or delete
-        apropriate notes / icoef / length
+    For all notes number, we check if len(list) is correct time and if larger or smaller,
+    append or delete apropriate notes / icoef / length
     Args: link_table, note_list, icoef_table, length_table
         link_table -
         note_list -
