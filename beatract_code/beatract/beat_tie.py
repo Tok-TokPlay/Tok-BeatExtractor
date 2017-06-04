@@ -870,7 +870,7 @@ def get_periodic(note_t1):
 
     return empty_number / len(note_t1)
 
-def get_weights(r_harmonics, note, note_value, icoef_value, time):
+def get_weights(r_harmonics, note, note_value, time, icoef_value):
     '''
     get weights of note`s with note_value and icoef_value.
     if icoef_value is large, weights are small.
@@ -946,3 +946,37 @@ def icoef_recalculation(note_list, icoef_table):
     Raises:
         nohting.
     '''
+
+def set_time_variation(weights_list, total_time, sampling_rate, time_variation=0.5):
+    '''
+    set weight`s time variation with given sampling rate and weight list length.
+    Args: weights_list, total_time, sampling_rate
+        weights_list - calculated weights_list.
+        total_time - total music time.
+        sampling_rate - sampling rate per seconds.
+    Return: time warped weights list.
+    Raise:
+        nothing.
+    '''
+    # Calculate basic number / length.
+    time_number = total_time / time_variation
+    weights_length = (total_time * sampling_rate) / len(weights_list)
+
+    # initialize dest_weight ( Return Value )
+    dest_weight = []
+    if time_number > weights_length:
+        # if CQT_length ( weight_length ) is longer then time_variation`s length...
+        hop_length = int(time_number / weights_length)
+        for src_weight in range(0, len(weights_list) - 1):
+            # Get Difference with now weights and next difference.
+            difference = (weights_list[src_weight] - weights_list[src_weight + 1]) / hop_length
+            for hop in range(0, hop_length):
+                dest_weight.append(weights_list[src_weight] + difference * hop)
+    else:
+        # if CQT_length ( weight_length ) is shorter then time_variation`s length...
+        hop_length = int(weights_length / time_number)
+        for src_weight in range(0, len(weights_length)):
+            # if not at hop_length * n`th location, ignore it.
+            if src_weight % hop_length == 0:
+                dest_weight.append(weights_list[src_weight])
+    return dest_weight

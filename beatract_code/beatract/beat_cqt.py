@@ -67,7 +67,7 @@ def take_local_maximum(two_dimension_list, threshold):
         # Add list to result and initialize high to empty list.
     return result
 
-def get_threshold(seed=0.75):
+def get_threshold(CQT_result, seed=0.75):
     '''
     Return the threshold number for CQT_result with differential value.
     Args : CQT_result, seed, result_hop
@@ -229,7 +229,8 @@ def stage_note(r_harmonics):
     return note
 
 def beatract(dir_name, file_name=-1, save_dir=-1, addable_option="-n", \
-specific=4, threshold_length=8, show_graph=-1, save_graph=-1, debugmode=-1):
+specific=4, threshold_length=8, show_graph=-1, save_graph=-1, debugmode=-1, \
+time_variation=0.5):
     '''
     at given dir_name/file_name extract beat and save it to txt file at save to.
     Args:
@@ -282,16 +283,24 @@ specific=4, threshold_length=8, show_graph=-1, save_graph=-1, debugmode=-1):
 
         _, note_list, icoef_table, _ = bt2.tie_note(note, threshold_length)
         weights = bt2.weightract(r_harmonic, note, note_list, icoef_table)
+
+        # Set Time variation for input values.
+        bt2.set_time_variation(weights, get_music_time(sampling_rate, len(audio_list)), \
+        sampling_rate, time_variation=time_variation)
+
         save_to(save_dir, file_name.split(".")[0] + ".txt", weights)
 
         if debugmode != -1:
             print "finished extract file..." + "... Now " + str(now) + " / "+  str(len(file_names))
 
         if show_graph != -1:
+            # if show graph is on...
             plt.figure()
             plt.plot(weights)
             plt.show()
+
         if save_graph != -1:
+            # if save graph is on...
             plt.figure()
             plt.plot(weights)
             plt.savefig(str(dir_name)+"/"+str(file_name.split(".")[0] + ".png"))
