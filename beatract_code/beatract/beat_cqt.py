@@ -292,11 +292,24 @@ specific=4, threshold_length=8, show_graph=-1, save_graph=-1, debugmode=-1):
             plt.plot(weights)
             plt.savefig(str(dir_name)+"/"+str(file_name.split(".")[0] + ".png"))
 
+def get_music_time(sampling_rate, music_length):
+    '''
+    input music_length and sampling rate, and calculated music time.
+    Args: sampling_rate, music_length
+        sampling_rate - sampling rate of music. ( for example, 44100Hz / Minutes )
+        music_length - audio list`s length for input music.
+    Return: time
+        time - music length with unit of second.
+    Raise:
+        nothing.
+    '''
+
 def save_to(dir_name, file_name, weight_list):
     '''
     save file_name to dir_name txt file with given weights list.
-    Args:
+    Args: dir_name, file_name, weight_list
     Return:
+        nothing.
     Raise:
         nothing.
     '''
