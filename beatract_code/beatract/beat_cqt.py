@@ -5,7 +5,7 @@ And related to check some musical analysis.
 
 import os
 import librosa as lb
-import beatract.beat_tie as bt2
+import beat_tie as bt2
 import matplotlib.pyplot as plt
 
 def to_wav(dir_name, save_dir, file_name, addable_option="-n"):
@@ -281,14 +281,15 @@ time_variation=0.5):
 
         note = stage_note(r_harmonic)
 
-        _, note_list, icoef_table, _ = bt2.tie_note(note, threshold_length)
+        _, note_list, icoef_table, _ = bt2.tie_note(note, threshold_length, debug_mode=1)
         weights = bt2.weightract(r_harmonic, note, note_list, icoef_table)
 
         # Set Time variation for input values.
-        bt2.set_time_variation(weights, get_music_time(sampling_rate, len(audio_list)), \
-        sampling_rate, time_variation=time_variation)
+        real_weights = bt2.set_time_variation(weights, \
+        get_music_time(sampling_rate, len(audio_list)), sampling_rate, \
+        time_variation=time_variation)
 
-        save_to(save_dir, file_name.split(".")[0] + ".txt", weights)
+        save_to(save_dir, file_name.split(".")[0] + ".txt", real_weights)
 
         if debugmode != -1:
             print "finished extract file..." + "... Now " + str(now) + " / "+  str(len(file_names))
@@ -296,13 +297,13 @@ time_variation=0.5):
         if show_graph != -1:
             # if show graph is on...
             plt.figure()
-            plt.plot(weights)
+            plt.plot(real_weights)
             plt.show()
 
         if save_graph != -1:
             # if save graph is on...
             plt.figure()
-            plt.plot(weights)
+            plt.plot(real_weights)
             plt.savefig(str(dir_name)+"/"+str(file_name.split(".")[0] + ".png"))
 
 def get_music_time(sampling_rate, music_length):

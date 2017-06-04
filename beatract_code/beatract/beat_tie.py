@@ -2,7 +2,7 @@
 This module act tie notes.
 To use this module, just call tie note.
 '''
-def tie_note(note, threshold):
+def tie_note(note, threshold, debug_mode=-1):
     '''
     tie notes which related to same instrument.
     Args: r_harmonic, note, far_th
@@ -110,7 +110,8 @@ def tie_note(note, threshold):
 
 
     for time in range(1, len(note)-1):
-        # print "Doing... : " + str(time) + " / " + str(len(note))
+        if debug_mode != -1:
+            print "Doing... : " + str(time) + " / " + str(len(note))
 		# Stable marriagement -> link notes 1 : 1
         stable_marriagement(note[time], note[time+1], link_table, note_list, length_table, \
         time, threshold)
@@ -837,7 +838,7 @@ def weightract(r_harmonics, note, note_list, icoef_table):
             # Weights are weights value / coef * periodicality.
             weights[note_number].append(\
             get_weights(r_harmonics, note, note_list[note_number][time], \
-            icoef_table[note_number][time], time))
+            time, icoef_table[note_number][time]))
             #get_weights(r_harmonics, note, note_list[note_number][sequence],\
             #icoef_table[note_number][sequence], sequence) * periodic[note_number])
     real_beat = []
@@ -884,7 +885,7 @@ def get_weights(r_harmonics, note, note_value, time, icoef_value):
     magnitude_sum = 0
     # Add all magnitudes for at all value in note[time][note_value]
     if len(note[time]) != 0:
-        for note_index in range(0, len(note[time][note_value])):
+        for note_index in range(0, len(note[time][note_value]) - 1):
             magnitude_sum += abs(r_harmonics[note[time][note_value][note_index]][time])
             # abs(r_harmonics) are magnitudes.
             # weights = magnitude_sum / (icoef_value+1)
@@ -909,14 +910,22 @@ def average_note_list(weight_t1):
         dispersion += weight_t1[length]
     return average / len(weight_t1)
 
-def note_length(note_t1):
+def real_note_length(note_t1):
     '''
     calculate length without -1 for input.
-    Args:
+    Args: note_t1
+        note_t1 - be calculated list.
     Return:
+        length - number of list contents without -1.
     Raises:
         nothing.
     '''
+    length = 0
+    for note_number in range(0, len(note_t1)):
+        if note_t1[note_number] != -1:
+            length += 1
+
+    return length
 
 def length_normalize(link_table, note_list, icoef_table, length_table, time):
     '''
@@ -960,23 +969,28 @@ def set_time_variation(weights_list, total_time, sampling_rate, time_variation=0
     '''
     # Calculate basic number / length.
     time_number = total_time / time_variation
-    weights_length = (total_time * sampling_rate) / len(weights_list)
+    weights_length = len(weights_list)
 
+    print time_number
+    print total_time
+    print time_variation
     # initialize dest_weight ( Return Value )
     dest_weight = []
     if time_number > weights_length:
         # if CQT_length ( weight_length ) is longer then time_variation`s length...
         hop_length = int(time_number / weights_length)
-        for src_weight in range(0, len(weights_list) - 1):
+        for src_weight in range(0, weights_length - 1):
             # Get Difference with now weights and next difference.
-            difference = (weights_list[src_weight] - weights_list[src_weight + 1]) / hop_length
+            difference = (weights_list[src_weight + 1] - weights_list[src_weight]) / hop_length
             for hop in range(0, hop_length):
                 dest_weight.append(weights_list[src_weight] + difference * hop)
+        dest_weight.append(weights_list[-1])
     else:
         # if CQT_length ( weight_length ) is shorter then time_variation`s length...
         hop_length = int(weights_length / time_number)
-        for src_weight in range(0, len(weights_length)):
+        for src_weight in range(0, weights_length - 1):
             # if not at hop_length * n`th location, ignore it.
             if src_weight % hop_length == 0:
                 dest_weight.append(weights_list[src_weight])
+        dest_weight.append(weights_list[-1])
     return dest_weight
