@@ -5,7 +5,7 @@ And related to check some musical analysis.
 
 import os
 import librosa as lb
-import beat_tie as bt2
+import beatract.beat_tie as bt2
 import matplotlib.pyplot as plt
 
 def to_wav(dir_name, save_dir, file_name, addable_option="-n"):
@@ -67,7 +67,7 @@ def take_local_maximum(two_dimension_list, threshold):
         # Add list to result and initialize high to empty list.
     return result
 
-def get_threshold(CQT_result, seed=0.75, result_hop=1000):
+def get_threshold(seed=0.75):
     '''
     Return the threshold number for CQT_result with differential value.
     Args : CQT_result, seed, result_hop
@@ -252,6 +252,7 @@ specific=4, threshold_length=8, show_graph=-1, save_graph=-1, debugmode=-1):
     for file_name in file_names:
         now += 1
         if debugmode != -1:
+            # if debugmode on, write debugging message to console.
             print "Strat extracting " + file_name + "... Now " + str(now) + " / "+  \
             str(len(file_names))
 
@@ -259,18 +260,21 @@ specific=4, threshold_length=8, show_graph=-1, save_graph=-1, debugmode=-1):
         # if want to extract some given length, give load to duration value.
         audio_list, sampling_rate = lb.load(dest_file, offset=0.0)
         if debugmode != -1:
+            # if debugmode on, write debugging message to console.
             print "file opend..." + "... Now " + str(now) + " / "+  str(len(file_names))
 
         music = lb.cqt(audio_list, sr=sampling_rate, fmin=lb.note_to_hz('C1'), n_bins=60*specific, \
         bins_per_octave=12*specific)
 
         if debugmode != -1:
+            # if debugmode on, write debugging message to console.
             print "file CQT finished..." + "... Now " + str(now) + " / "+  str(len(file_names))
 
         threshold = get_threshold(music)
         _, r_harmonic = parse_noise(music, threshold)
 
         if debugmode != -1:
+            # if debugmode on, write debugging message to console.
             print "file CQT harmonics extracted..." + "... Now " + str(now) + " / " + \
             str(len(file_names))
 
