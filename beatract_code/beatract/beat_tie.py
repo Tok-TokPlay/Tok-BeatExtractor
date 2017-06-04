@@ -2,6 +2,7 @@
 This module act tie notes.
 To use this module, just call tie note.
 '''
+import beat_cqt as bt
 def tie_note(note, threshold, debug_mode=-1):
     '''
     tie notes which related to same instrument.
@@ -123,6 +124,9 @@ def tie_note(note, threshold, debug_mode=-1):
         append_list(note, link_table, note_list, icoef_table, length_table, time)
     # Delete last empty appended list.
     del link_table[-1]
+    # icoef error correction.
+    icoef_recalculation(note_list, icoef_table)
+
     return link_table, note_list, icoef_table, length_table
 
 def stable_marriagement(note_t1, note_t2, link_table, note_list, length_table, time, threshold):
@@ -903,11 +907,8 @@ def average_note_list(weight_t1):
         nothing.
     '''
     average = 0
-    dispersion = 0
     for length in range(0, len(weight_t1)):
         average += weight_t1[length]
-    for length in range(0, len(weight_t1)):
-        dispersion += weight_t1[length]
     return average / len(weight_t1)
 
 def real_note_length(note_t1):
@@ -929,7 +930,7 @@ def real_note_length(note_t1):
 
 def length_normalize(link_table, note_list, icoef_table, length_table, time):
     '''
-    Normalize 4 list with time domain. In other word, 
+    Normalize 4 list with time domain. In other word, error correction for 4 lists.
     For all notes number, we check if len(list) is correct time and if larger or smaller,
     append or delete apropriate notes / icoef / length.
     Check link_table`s length is...     [time-1][note_number]   is form.
@@ -992,6 +993,34 @@ def icoef_recalculation(note_list, icoef_table):
     Raises:
         nohting.
     '''
+    # initialize icoef_table.
+    icoef_table = bt.make_empty_list([len(note_list)], [])
+    for time in range(0, len(note_list[0])):
+        max_value = -1
+        for note_number in range(0, len(note_list)):
+            if max_value < note_list[note_number][time]:
+                max_value = note_list[note_number][time]
+
+        # initialize icoef_list with 0.
+        icoef_list = bt.make_empty_list([max_value+1], [])
+        for index in range(0, max_value+1):
+            icoef_list[index].append(0)
+
+        for note_number in range(0, len(note_list)):
+            # for all value in icoef_list, if index`s number is appear, add 1.
+            if note_list[note_number][time] != -1:
+                icoef_list[note_list[note_number][time]][0] += 1
+
+        # Fill icoef table.
+        for note_number in range(0, len(note_list)):
+            if note_list[note_number][time] == -1:
+                # if -1, add 0.
+                icoef_table[note_number].append(0)
+            else:
+                for index_number in range(0, len(icoef_list)):
+                    if note_list[note_number][time] == index_number:
+                        # if not -1, add overlapping number.
+                        icoef_table[note_number].append(icoef_list[index_number][0])
 
 def set_time_variation(weights_list, total_time, sampling_rate, time_variation=0.5):
     '''
