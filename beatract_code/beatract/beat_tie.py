@@ -890,9 +890,10 @@ def get_weights(r_harmonics, note, note_value, time, icoef_value):
     # Add all magnitudes for at all value in note[time][note_value]
     if len(note[time]) != 0:
         for note_index in range(0, len(note[time][note_value]) - 1):
-            magnitude_sum += abs(r_harmonics[note[time][note_value][note_index]][time])
             # abs(r_harmonics) are magnitudes.
-            # weights = magnitude_sum / (icoef_value+1)
+            magnitude_sum += abs(r_harmonics[note[time][note_value][note_index]][time])
+            # Then divide it with giben iceof_value.
+            magnitude_sum /= (icoef_value + 1)
     return magnitude_sum
 
 def average_note_list(weight_t1):
