@@ -108,7 +108,6 @@ def tie_note(note, threshold, debug_mode=-1):
 
     append_list(note, link_table, note_list, icoef_table, length_table, 0)
 
-
     for time in range(1, len(note)-1):
         if debug_mode != -1:
             print "Doing... : " + str(time) + " / " + str(len(note))
@@ -122,6 +121,7 @@ def tie_note(note, threshold, debug_mode=-1):
 		length_table, time, threshold)
 		# renew 4 tables
         append_list(note, link_table, note_list, icoef_table, length_table, time)
+    # Delete last empty appended list.
     del link_table[-1]
     return link_table, note_list, icoef_table, length_table
 
@@ -511,8 +511,8 @@ def append_list(note, link_table, note_list, icoef_table, length_table, time):
     append_icoef(note_list, icoef_table)
     # Append length_table at note.
     append_length(note, note_list, length_table, time)
-    #print "length : " + str(length_table)
-    #print "note : " + str(note_list)
+    # Error Correction with length_normalize.
+    length_normalize(link_table, note_list, icoef_table, length_table, time)
     # Append link_table empty...
     # This mean Initailize which is not linked.
     link_table.append([])
@@ -929,27 +929,64 @@ def real_note_length(note_t1):
 
 def length_normalize(link_table, note_list, icoef_table, length_table, time):
     '''
-    Normalize 4 list with time domain.
+    Normalize 4 list with time domain. In other word, 
     For all notes number, we check if len(list) is correct time and if larger or smaller,
-    append or delete apropriate notes / icoef / length
+    append or delete apropriate notes / icoef / length.
+    Check link_table`s length is...     [time-1][note_number]   is form.
+    Check note_list`s length is...      [note_number][time]     is form.
+    Check icoef_table`s length is...    [note_number][time]     is form.
+    Check length_table`s length is...   [note_number][time-1]   is form.
     Args: link_table, note_list, icoef_table, length_table
-        link_table -
-        note_list -
-        icoef_table -
-        length_table -
+        link_table - link information of notes.
+            see tie_note() for more information.
+        note_list - note index list with link_table.
+            see tie_note() for more information.
+        icoef_table - inversed coefficient of note information.
+            see tie_note() for more information.
+        length_table - length information table.
+            see tie_note() for more information.
     Return:
         nothing.
     Raises:
         nohting.
     '''
+    # Standard is link_table.
+    if time != 0:
+        note_number = len(link_table[-1])
+        if len(note_list) == note_number:
+            for notes in range(0, note_number):
+                # for all range of note_list...
+                if len(note_list[notes]) != time:
+                    # if note_list[notes]`s length is not time then append it.
+                    while len(note_list[notes]) != time:
+                        # append last number.
+                        note_list[notes].append(note_list[-1])
+        if len(icoef_table) == note_number:
+            for notes in range(0, note_number):
+                # for all range of note_list...
+                if len(icoef_table[notes]) != time:
+                    # if icoef_table[notes]`s length is note time then append it.
+                    while len(icoef_table[notes]) != time:
+                        # append last number.
+                        icoef_table[notes].append(icoef_table[-1])
+        if len(length_table) == note_number:
+            for notes in range(0, note_number):
+                # for all range of note_list...
+                if len(length_table[notes]) != time-1:
+                    # if icoef_table[notes]`s length is note time then append it.
+                    while len(length_table[notes]) != time-1:
+                        # append last number.
+                        length_table[notes].append(length_table[-1])
 
 def icoef_recalculation(note_list, icoef_table):
     '''
     Recalculation icoef_table with calculated note_list.
     Confirm icoef can mean note_list`s sharing note`s information.
     Args: note_list, icoef_table
-        note_list -
-        icoef_table -
+        note_list - note index list with link_table.
+            see tie_note() for more information.
+        icoef_table - inversed coefficient of note information.
+            see tie_note() for more information.
     Return:
         nothing.
     Raises:
@@ -971,9 +1008,6 @@ def set_time_variation(weights_list, total_time, sampling_rate, time_variation=0
     time_number = total_time / time_variation
     weights_length = len(weights_list)
 
-    print time_number
-    print total_time
-    print time_variation
     # initialize dest_weight ( Return Value )
     dest_weight = []
     if time_number > weights_length:
