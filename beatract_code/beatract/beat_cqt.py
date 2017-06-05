@@ -281,6 +281,7 @@ time_variation=0.5):
 
         note = stage_note(r_harmonic)
 
+
         _, note_list, icoef_table, _ = bt2.tie_note(note, threshold_length, debug_mode=1)
         weights = bt2.weightract(r_harmonic, note, note_list, icoef_table)
 
