@@ -126,6 +126,7 @@ def tie_note(note, threshold, debug_mode=-1):
     del link_table[-1]
     # icoef error correction.
     icoef_recalculation(note_list, icoef_table)
+    length_normalize(link_table, note_list, icoef_table, length_table, len(note)-1)
 
     return link_table, note_list, icoef_table, length_table
 
@@ -241,8 +242,15 @@ def get_length(length_table, note_list, time, i):
     '''
     # take all value in length_table`s time-1`s i th note`s length.
     for note_number in range(0, len(note_list)):
-        if note_list[note_number][time] == i:
-            return length_table[note_number][time-2]
+        try:
+            if len(note_list[note_number]) != 0:
+                if note_list[note_number][-1] == i:
+                    if len(length_table[note_number]) == 0:
+                        return -1
+                    else:
+                        return length_table[note_number][time-2]
+        except IndexError:
+            return length_table[note_number][-1]
     return -1
 
 def is_free_note(propose_queue, link_table, time):
@@ -464,9 +472,12 @@ def calc_icoef(icoef_table, note_list, time, note_list_number):
         nothing
     '''
     # Return icoef value of table which note number is "note_list_number" and at time.
-    for note_number in range(0, len(note_list)):
-        if note_list[note_number][time] == note_list_number:
-            return icoef_table[note_number][time-1]
+    try:
+        for note_number in range(0, len(note_list)):
+            if note_list[note_number][time] == note_list_number:
+                return icoef_table[note_number][time]
+    except IndexError:
+        return -1
 
 def append_list(note, link_table, note_list, icoef_table, length_table, time):
     '''
@@ -645,11 +656,19 @@ def append_length(note, note_list, length_table, time):
             note_list[note_number].append(note_list[note_number][-1])
             # For Error Correction... This case must not occur but occured sometimes...
             # Specific Debugging is needed.
-        if note_list[note_number][time + 1] == -1:
-            length_table[note_number].append(0)
+        try:
+            if note_list[note_number][time + 1] == -1:
+                length_table[note_number].append(0)
+        except IndexError:
+            if note_list[note_number][-1] == -1:
+                length_table[note_number].append(0)
+
         else:
-            length = mid(note[time][note_list[note_number][time]]) \
-            - mid(note[time+1][note_list[note_number][time+1]])
+            try:
+                length = mid(note[time][note_list[note_number][time]]) \
+                - mid(note[time+1][note_list[note_number][time+1]])
+            except IndexError:
+                length = length_table[note_number][-1]
             length_table[note_number].append(length)
 
 def append_note(link_table, note_list, icoef_table, length_table, time):
@@ -720,7 +739,7 @@ def append_note(link_table, note_list, icoef_table, length_table, time):
                     del icoef_table[copy_number]
                     del length_table[copy_number]
         for finished_note in range(0, len(note_list)):
-            if len(note_list[finished_note]) == time + 1 and note_list[finished_note][-1] == -1:
+            if len(note_list[finished_note]) == time and note_list[finished_note][-1] == -1:
                 note_list[finished_note].append(-1)
 
 def absent_note(link_table, index, before_index, time):
@@ -759,11 +778,16 @@ def add_notelist(note_list, time, index, contents):
     Raise:
         nothing.
     '''
-    for note_number in range(0, len(note_list)):
-        if note_list[note_number][time] == index:
-            # if at time value is index, append contents.
-            note_list[note_number].append(contents)
-
+    try:
+        for note_number in range(0, len(note_list)):
+            if note_list[note_number][time] == index:
+                # if at time value is index, append contents.
+                note_list[note_number].append(contents)
+    except IndexError:
+        for note_number in range(0, len(note_list)):
+            if note_list[note_number][-1] == index:
+                # if at time value is index, append contents.
+                note_list[note_number].append(contents)
 def capiable(note_list, time, index, copy_number):
     '''
     Does note_list[copy_number][time] is copiable?
@@ -774,11 +798,19 @@ def capiable(note_list, time, index, copy_number):
     Raise:
         nothing.
     '''
-    if note_list[copy_number][time] == index:
-        # if value is index.
-        if len(note_list[copy_number]) == time:
-            # if length is time...
-            return True
+    try:
+        if note_list[copy_number][time] == index:
+            # if value is index.
+            if len(note_list[copy_number]) == time:
+                # if length is time...
+                return True
+    except IndexError:
+        if note_list[copy_number][-1] == index:
+            # if value is index.
+            if len(note_list[copy_number]) == time:
+                # if length is time...
+                return True
+
     return False
 
 def mid(note):
@@ -837,20 +869,31 @@ def weightract(r_harmonics, note, note_list, icoef_table):
 
     weights = []
     for note_number in range(0, len(note_list)):
+        print "Weightracting... : " + str(note_number) + " / " + str(len(note_list))
         weights.append([])
         for time in range(0, len(note_list[note_number])):
             # Weights are weights value / coef * periodicality.
-            weights[note_number].append(\
-            get_weights(r_harmonics, note, note_list[note_number][time], \
-            time, icoef_table[note_number][time]))
-            #get_weights(r_harmonics, note, note_list[note_number][sequence],\
-            #icoef_table[note_number][sequence], sequence) * periodic[note_number])
+            try:
+                weights[note_number].append(\
+                get_weights(r_harmonics, note, note_list[note_number][time], \
+                time, icoef_table[note_number][time]))
+            except IndexError:
+                weights[note_number].append(\
+                get_weights(r_harmonics, note, note_list[note_number][time], \
+                time, -1))
+                #get_weights(r_harmonics, note, note_list[note_number][sequence],\
+                #icoef_table[note_number][sequence], sequence) * periodic[note_number])
     real_beat = []
     # Add all beat weights.
+    before_add = 0
     for note_number2 in range(0, len(weights[0])):
         _sum = 0
         for note_number1 in range(0, len(weights)):
-            _sum += weights[note_number1][note_number2]
+            try:
+                _sum += weights[note_number1][note_number2]
+                before_add = weights[note_number1][note_number2]
+            except IndexError:
+                _sum += before_add
         real_beat.append(_sum)
 
     return real_beat
@@ -888,12 +931,19 @@ def get_weights(r_harmonics, note, note_value, time, icoef_value):
     '''
     magnitude_sum = 0
     # Add all magnitudes for at all value in note[time][note_value]
-    if len(note[time]) != 0:
-        for note_index in range(0, len(note[time][note_value]) - 1):
-            # abs(r_harmonics) are magnitudes.
-            magnitude_sum += abs(r_harmonics[note[time][note_value][note_index]][time])
-            # Then divide it with giben iceof_value.
-            magnitude_sum /= (icoef_value + 1)
+    try:
+        if len(note[time]) != 0:
+            try:
+                for note_index in range(0, len(note[time][note_value]) - 1):
+                    # abs(r_harmonics) are magnitudes.
+                    magnitude_sum += abs(r_harmonics[note[time][note_value][note_index]][time])
+                    # Then divide it with giben iceof_value.
+                    magnitude_sum /= (icoef_value + 1)
+            except IndexError:
+                magnitude_sum = 0
+    except IndexError:
+        magnitude_sum = 0
+
     return magnitude_sum
 
 def average_note_list(weight_t1):
@@ -958,30 +1008,36 @@ def length_normalize(link_table, note_list, icoef_table, length_table, time):
         if len(note_list) == note_number:
             for notes in range(0, note_number):
                 # for all range of note_list...
-                if len(note_list[notes]) != time:
+                if len(note_list[notes]) != time + 1:
                     # if note_list[notes]`s length is not time then append it.
-                    while len(note_list[notes]) < time:
+                    while len(note_list[notes]) < time + 1:
                         # append last number.
-                        note_list[notes].append(note_list[-1])
-                    while len(note_list[notes]) > time:
+                        note_list[notes].append(note_list[notes][-1])
+                    while len(note_list[notes]) > time + 1:
                         # delete last number.
                         del note_list[notes][-1]
         if len(icoef_table) == note_number:
             for notes in range(0, note_number):
                 # for all range of note_list...
-                if len(icoef_table[notes]) != time:
+                if len(icoef_table[notes]) != time  + 1:
                     # if icoef_table[notes]`s length is note time then append it.
-                    while len(icoef_table[notes]) != time:
+                    while len(icoef_table[notes]) < time  + 1:
                         # append last number.
-                        icoef_table[notes].append(icoef_table[-1])
+                        icoef_table[notes].append(icoef_table[notes][-1])
+                    while len(icoef_table[notes]) > time + 1:
+                        # delete last number.
+                        del icoef_table[notes][-1]
         if len(length_table) == note_number:
             for notes in range(0, note_number):
                 # for all range of note_list...
-                if len(length_table[notes]) != time-1:
+                if len(length_table[notes]) != time:
                     # if icoef_table[notes]`s length is note time then append it.
-                    while len(length_table[notes]) != time-1:
+                    while len(length_table[notes]) < time:
                         # append last number.
-                        length_table[notes].append(length_table[-1])
+                        length_table[notes].append(length_table[notes][-1])
+                    while len(length_table[notes]) >= time:
+                        # delete last number.
+                        del length_table[notes][-1]
 
 def icoef_recalculation(note_list, icoef_table):
     '''
@@ -1002,8 +1058,11 @@ def icoef_recalculation(note_list, icoef_table):
     for time in range(0, len(note_list[0])):
         max_value = -1
         for note_number in range(0, len(note_list)):
-            if max_value < note_list[note_number][time]:
-                max_value = note_list[note_number][time]
+            try:
+                if max_value < note_list[note_number][time]:
+                    max_value = note_list[note_number][time]
+            except IndexError:
+                max_value = max_value
 
         # initialize icoef_list with 0.
         icoef_list = bt.make_empty_list([max_value+1], [])
@@ -1012,19 +1071,26 @@ def icoef_recalculation(note_list, icoef_table):
 
         for note_number in range(0, len(note_list)):
             # for all value in icoef_list, if index`s number is appear, add 1.
-            if note_list[note_number][time] != -1:
-                icoef_list[note_list[note_number][time]][0] += 1
+            try:
+                if note_list[note_number][time] != -1:
+                    icoef_list[note_list[note_number][time]][0] += 1
+            except IndexError:
+                max_value = max_value
 
         # Fill icoef table.
         for note_number in range(0, len(note_list)):
-            if note_list[note_number][time] == -1:
-                # if -1, add 0.
-                icoef_table[note_number].append(0)
-            else:
-                for index_number in range(0, len(icoef_list)):
-                    if note_list[note_number][time] == index_number:
-                        # if not -1, add overlapping number.
-                        icoef_table[note_number].append(icoef_list[index_number][0])
+            try:
+                if note_list[note_number][time] == -1:
+                    # if -1, add 0.
+                    icoef_table[note_number].append(0)
+                else:
+                    for index_number in range(0, len(icoef_list)):
+                        if note_list[note_number][time] == index_number:
+                            # if not -1, add overlapping number.
+                            icoef_table[note_number].append(icoef_list[index_number][0])
+            except IndexError:
+                max_value = max_value
+
 
 def set_time_variation(weights_list, total_time, sampling_rate, time_variation=0.5):
     '''
