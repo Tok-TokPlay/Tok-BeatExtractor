@@ -939,7 +939,10 @@ def get_weights(r_harmonics, note, note_value, time, icoef_value):
                     # abs(r_harmonics) are magnitudes.
                     magnitude_sum += abs(r_harmonics[note[time][note_value][note_index]][time])
                     # Then divide it with giben iceof_value.
-                    magnitude_sum /= (icoef_value + 1)
+                    if icoef_value < 0:
+                        magnitude_sum = magnitude_sum
+                    else:
+                        magnitude_sum /= (icoef_value + 1)
             except IndexError:
                 magnitude_sum = 0
     except IndexError:

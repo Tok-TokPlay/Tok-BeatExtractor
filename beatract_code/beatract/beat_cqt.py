@@ -287,7 +287,8 @@ time_variation=0.5, time_warping=60, inner_debug=-1):
             audio_list, sampling_rate = lb.load(dest_file, offset=0.0)
             if debugmode != -1:
                 # if debugmode on, write debugging message to console.
-                print "file opend..." + "... Now " + str(now) + " / "+  str(len(file_names))
+                print "file opend..." + "... Now " + str(now) + " / " +  str(len(file_names))\
+                + " " + file_name
 
             music = lb.cqt(audio_list, sr=sampling_rate, fmin=lb.note_to_hz('C1'), \
             n_bins=60*specific, bins_per_octave=12*specific)
@@ -295,7 +296,8 @@ time_variation=0.5, time_warping=60, inner_debug=-1):
             if debugmode != -1:
                 # if debugmode on, write debugging message to console.
                 print "file CQT finished..." + "... Now " + str(now) + " / " + \
-                str(len(file_names))
+                str(len(file_names))\
+                + " " + file_name
 
             threshold = get_threshold(music)
             _, r_harmonic = parse_noise(music, threshold)
@@ -303,13 +305,27 @@ time_variation=0.5, time_warping=60, inner_debug=-1):
             if debugmode != -1:
                 # if debugmode on, write debugging message to console.
                 print "file CQT harmonics extracted..." + "... Now " + str(now) + " / " + \
-                str(len(file_names))
+                str(len(file_names))\
+                + " " + file_name
 
             note = stage_note(r_harmonic)
 
 
+            if debugmode != -1:
+                # if debugmode on, write debugging message to console.
+                print "file tie_note..." + "... Now " + str(now) + " / " + \
+                str(len(file_names))\
+                + " " + file_name
+
             _, note_list, icoef_table, _ = bt2.tie_note(note, threshold_length, \
             debug_mode=inner_debug)
+
+            if debugmode != -1:
+                # if debugmode on, write debugging message to console.
+                print "file weightract..." + "... Now " + str(now) + " / " + \
+                str(len(file_names))\
+                + " " + file_name
+
             weights = bt2.weightract(r_harmonic, note, note_list, icoef_table, \
             debug_mode=inner_debug)
 
@@ -323,7 +339,8 @@ time_variation=0.5, time_warping=60, inner_debug=-1):
         save_to(save_dir, file_name.split(".")[0] + ".txt", real_output)
 
         if debugmode != -1:
-            print "finished extract file..." + "... Now " + str(now) + " / "+  str(len(file_names))
+            print "finished extract file..." + "... Now " + str(now) + " / "+  str(len(file_names))\
+            + " " + file_name
 
         if show_graph != -1:
             # if show graph is on...
