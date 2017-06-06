@@ -230,7 +230,7 @@ def stage_note(r_harmonics):
 
 def beatract(dir_name, file_name=-1, save_dir=-1, addable_option="-n", \
 specific=4, threshold_length=8, show_graph=-1, save_graph=-1, debugmode=-1, \
-time_variation=0.5):
+time_variation=0.5, time_warping=60):
     '''
     at given dir_name/file_name extract beat and save it to txt file at save to.
     Args:
@@ -256,41 +256,71 @@ time_variation=0.5):
             # if debugmode on, write debugging message to console.
             print "Strat extracting " + file_name + "... Now " + str(now) + " / "+  \
             str(len(file_names))
+        # y, sr for calculate seconds.
+        y, sr = lb.load(dir_name + '/' + file_name)
+        second = len(y) / sr
 
-        dest_file = to_wav(dir_name, dir_name, file_name, addable_option)
-        # if want to extract some given length, give load to duration value.
-        audio_list, sampling_rate = lb.load(dest_file, offset=0.0)
-        if debugmode != -1:
-            # if debugmode on, write debugging message to console.
-            print "file opend..." + "... Now " + str(now) + " / "+  str(len(file_names))
+        time = 0
+        real_output = []
 
-        music = lb.cqt(audio_list, sr=sampling_rate, fmin=lb.note_to_hz('C1'), n_bins=60*specific, \
-        bins_per_octave=12*specific)
+        while second > 0:
+            if second > time_warping:
+                #Start from times * 60 and with 60 seconds.
+                addable_option = addable_option + " -ss " + str(time_warping * time) \
+                + " -t " + str(time_warping)
+    
+                #to Wav file with same name, so we can get just one file.
+                dest_file = to_wav(dir_name, dir_name, file_name, addable_option)
+                time += 1
+                second -= time_warping
+            else:
+                #Start from times * 60 and with remain seconds.
+                addable_option = addable_option + " -ss " + str(time_warping * time) \
+                + " -t " + str(second)
 
-        if debugmode != -1:
-            # if debugmode on, write debugging message to console.
-            print "file CQT finished..." + "... Now " + str(now) + " / "+  str(len(file_names))
+                #to Wav file with same name, so we can get just one file.
+                dest_file = to_wav(dir_name, dir_name, file_name, addable_option)
+                second = 0
+                time += 1
 
-        threshold = get_threshold(music)
-        _, r_harmonic = parse_noise(music, threshold)
+            # if want to extract some given length, give load to duration value.
+            audio_list, sampling_rate = lb.load(dest_file, offset=0.0)
+            if debugmode != -1:
+                # if debugmode on, write debugging message to console.
+                print "file opend..." + "... Now " + str(now) + " / "+  str(len(file_names))
 
-        if debugmode != -1:
-            # if debugmode on, write debugging message to console.
-            print "file CQT harmonics extracted..." + "... Now " + str(now) + " / " + \
-            str(len(file_names))
+            music = lb.cqt(audio_list, sr=sampling_rate, fmin=lb.note_to_hz('C1'), \
+            n_bins=60*specific, bins_per_octave=12*specific)
 
-        note = stage_note(r_harmonic)
+            if debugmode != -1:
+                # if debugmode on, write debugging message to console.
+                print "file CQT finished..." + "... Now " + str(now) + " / " + \
+                str(len(file_names))
+
+            threshold = get_threshold(music)
+            _, r_harmonic = parse_noise(music, threshold)
+
+            if debugmode != -1:
+                # if debugmode on, write debugging message to console.
+                print "file CQT harmonics extracted..." + "... Now " + str(now) + " / " + \
+                str(len(file_names))
+
+            note = stage_note(r_harmonic)
 
 
-        _, note_list, icoef_table, _ = bt2.tie_note(note, threshold_length, debug_mode=1)
-        weights = bt2.weightract(r_harmonic, note, note_list, icoef_table)
+            _, note_list, icoef_table, _ = bt2.tie_note(note, threshold_length, \
+            debug_mode=debugmode)
+            weights = bt2.weightract(r_harmonic, note, note_list, icoef_table, \
+            debug_mode=debugmode)
 
-        # Set Time variation for input values.
-        real_weights = bt2.set_time_variation(weights, \
-        get_music_time(sampling_rate, len(audio_list)), sampling_rate, \
-        time_variation=time_variation)
+            # Set Time variation for input values.
+            real_weights = bt2.set_time_variation(weights, \
+            get_music_time(sampling_rate, len(audio_list)), sampling_rate, \
+            time_variation=time_variation)
 
-        save_to(save_dir, file_name.split(".")[0] + ".txt", real_weights)
+            real_output += real_weights
+
+        save_to(save_dir, file_name.split(".")[0] + ".txt", real_output)
 
         if debugmode != -1:
             print "finished extract file..." + "... Now " + str(now) + " / "+  str(len(file_names))

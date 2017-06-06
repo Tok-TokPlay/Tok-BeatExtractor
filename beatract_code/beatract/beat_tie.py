@@ -851,7 +851,7 @@ def distance(note_t1, note_t2):
             mid(note_t2[note_number2])))
     return difference
 
-def weightract(r_harmonics, note, note_list, icoef_table):
+def weightract(r_harmonics, note, note_list, icoef_table, debug_mode):
     '''
     Extract beat with some weights.
     Periodic instrument( note link ) will have low weights.
@@ -869,7 +869,8 @@ def weightract(r_harmonics, note, note_list, icoef_table):
 
     weights = []
     for note_number in range(0, len(note_list)):
-        print "Weightracting... : " + str(note_number) + " / " + str(len(note_list))
+        if debug_mode != -1:
+            print "Weightracting... : " + str(note_number) + " / " + str(len(note_list))
         weights.append([])
         for time in range(0, len(note_list[note_number])):
             # Weights are weights value / coef * periodicality.
