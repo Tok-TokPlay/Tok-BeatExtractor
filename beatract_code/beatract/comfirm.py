@@ -5,7 +5,7 @@ debugging console.
 import beat_cqt as bt
 import beat_tie as bt2
 
-dir_name = "/home/sshrik/Music/Dest"
+dir_name = "/home/sshrik/Music/2100"
 #save_dir = "/home/sshrik/Workspace/python/Music/WAV"
 
 bt.beatract(dir_name=dir_name, time_variation=0.05, \

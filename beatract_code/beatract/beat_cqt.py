@@ -369,7 +369,7 @@ def get_music_time(sampling_rate, music_length):
     # So just devide length with rate.
     return music_length / sampling_rate
 
-def save_to(dir_name, file_name, weight_list):
+def save_to(dir_name, file_name, weight_list, standard_output=50000):
     '''
     save file_name to dir_name txt file with given weights list.
     Args: dir_name, file_name, weight_list
@@ -381,6 +381,11 @@ def save_to(dir_name, file_name, weight_list):
     # Check for files name.
     files = open(str(dir_name)+"/"+str(file_name), "w")
     # for all weigths, write in files.
+    max_value = -1
     for weights in range(0, len(weight_list)):
-        files.write(str(weight_list[weights])+ "\n")
+        if weight_list[weights] > max_value:
+            max_value = weight_list[weights]
+
+    for weights in range(0, len(weight_list)):
+        files.write(str(weight_list[weights] * standard_output / max_value)+ "\n")
     files.close()

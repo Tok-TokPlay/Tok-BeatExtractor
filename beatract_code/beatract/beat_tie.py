@@ -1016,6 +1016,8 @@ def length_normalize(link_table, note_list, icoef_table, length_table, time):
                     # if note_list[notes]`s length is not time then append it.
                     while len(note_list[notes]) < time + 1:
                         # append last number.
+                        if len(note_list[notes]) == 0:
+                            note_list[notes].append([-1])
                         note_list[notes].append(note_list[notes][-1])
                     while len(note_list[notes]) > time + 1:
                         # delete last number.
@@ -1027,6 +1029,8 @@ def length_normalize(link_table, note_list, icoef_table, length_table, time):
                     # if icoef_table[notes]`s length is note time then append it.
                     while len(icoef_table[notes]) < time  + 1:
                         # append last number.
+                        if len(icoef_table[notes]) == 0:
+                            icoef_table[notes].append([-1])
                         icoef_table[notes].append(icoef_table[notes][-1])
                     while len(icoef_table[notes]) > time + 1:
                         # delete last number.
@@ -1038,6 +1042,8 @@ def length_normalize(link_table, note_list, icoef_table, length_table, time):
                     # if icoef_table[notes]`s length is note time then append it.
                     while len(length_table[notes]) < time:
                         # append last number.
+                        if len(length_table[notes]) == 0:
+                            length_table[notes].append([0])
                         length_table[notes].append(length_table[notes][-1])
                     while len(length_table[notes]) >= time:
                         # delete last number.
