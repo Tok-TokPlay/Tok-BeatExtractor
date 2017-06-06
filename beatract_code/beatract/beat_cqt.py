@@ -230,7 +230,7 @@ def stage_note(r_harmonics):
 
 def beatract(dir_name, file_name=-1, save_dir=-1, addable_option="-n", \
 specific=4, threshold_length=8, show_graph=-1, save_graph=-1, debugmode=-1, \
-time_variation=0.5, time_warping=60):
+time_variation=0.5, time_warping=60, inner_debug=-1):
     '''
     at given dir_name/file_name extract beat and save it to txt file at save to.
     Args:
@@ -268,7 +268,7 @@ time_variation=0.5, time_warping=60):
                 #Start from times * 60 and with 60 seconds.
                 addable_option = addable_option + " -ss " + str(time_warping * time) \
                 + " -t " + str(time_warping)
-    
+
                 #to Wav file with same name, so we can get just one file.
                 dest_file = to_wav(dir_name, dir_name, file_name, addable_option)
                 time += 1
@@ -309,9 +309,9 @@ time_variation=0.5, time_warping=60):
 
 
             _, note_list, icoef_table, _ = bt2.tie_note(note, threshold_length, \
-            debug_mode=debugmode)
+            debug_mode=inner_debug)
             weights = bt2.weightract(r_harmonic, note, note_list, icoef_table, \
-            debug_mode=debugmode)
+            debug_mode=inner_debug)
 
             # Set Time variation for input values.
             real_weights = bt2.set_time_variation(weights, \
