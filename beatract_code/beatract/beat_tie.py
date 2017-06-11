@@ -217,10 +217,14 @@ def make_queue(note_t1, note_t2, length_table, note_list, difference, threshold,
         # Add empty list at index of t1_number.
         prefer_list.append([])
         for t2_number in range(0, len(note_t2)):
-            if get_length(length_table, note_list, time, t1_number) + threshold > \
-            difference[t1_number][t2_number]:
+            try:
+                if get_length(length_table, note_list, time, t1_number) + threshold > \
+                difference[t1_number][t2_number]:
                 # Add prefer_list to index "t2_number".
-                prefer_list[t1_number].append(t2_number)
+                    prefer_list[t1_number].append(t2_number)
+            except TypeError:
+                # Do nothing.
+                t2_number = t2_number
     return prefer_list
 
 def get_length(length_table, note_list, time, i):
@@ -399,9 +403,13 @@ def coverage(note_t1, note_t2, link_table, note_list, length_table, time, thresh
             # if not linked note_number1
             note_number2 = get_smallest_index(note_number1, difference)
             if note_number2 != -1:
-                if difference[note_number1][note_number2] < get_length(length_table, \
-                note_list, time, note_number1) + threshold:
-                    make_link(link_table, time, note_number1, note_number2)
+                try:
+                    if difference[note_number1][note_number2] < get_length(length_table, \
+                    note_list, time, note_number1) + threshold:
+                        make_link(link_table, time, note_number1, note_number2)
+                except TypeError:
+                    #Do Nothing.
+                    note_number2 = note_number2
 
 def get_smallest_index(note_number1, difference):
     '''
@@ -668,7 +676,10 @@ def append_length(note, note_list, length_table, time):
                 length = mid(note[time][note_list[note_number][time]]) \
                 - mid(note[time+1][note_list[note_number][time+1]])
             except IndexError:
-                length = length_table[note_number][-1]
+                try:
+                    length = length_table[note_number][-1]
+                except IndexError:
+                    length = 0
             length_table[note_number].append(length)
 
 def append_note(link_table, note_list, icoef_table, length_table, time):

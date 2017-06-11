@@ -7,6 +7,109 @@ import os
 import librosa as lb
 import beat_tie as bt2
 import matplotlib.pyplot as plt
+import wave
+import struct
+
+def vocalization(mp3_file, mr_file, save_dir=-1, mp3_dir=-1, mr_dir=-1, ar_name=-1):
+	######################### Control part ###########################################
+    mp3_dir_flag = False
+    mr_dir_flag = False
+    save_dir_flag = False
+    ar_flag = False
+
+    if save_dir != -1:
+        # Save to save_dir. if not, Save to mr directory.
+        save_dir_flag = True
+
+    if mp3_dir != -1:
+        # find at mp3_dir. if not, find to same python folder.
+        mp3_dir_flag = True
+
+    if mr_dir != -1:
+        # find at mp3_dir. if not, find to same python folder.
+        mr_dir_flag = True
+
+    if save_dir != -1:
+        # Save file dir is not defined, save to mr folder file.
+        save_dir_flag = True
+
+    if ar_name != -1:
+        # saving file name. if not, save with mp3_file(AR).mp3 or wav.
+        ar_flag = True
+
+    # mp3 file to wav files.
+    if mp3_dir_flag:
+        mp3_file_name = to_wav(mp3_dir, mp3_dir, mp3_file)
+    else:
+        mp3_file_name = to_wav("", "", mp3_file)
+    # mr file to wav files.
+    if mr_dir_flag:
+        mr_file_name = to_wav(mr_dir, mr_dir, mr_file)
+    else:
+        mr_file_name = to_wav("", "", mr_file)
+    ######################### Control part ###########################################
+    ######################### Naming part ############################################
+    # save file name to f_song and f_inst.
+    f_song = mp3_file_name
+    f_inst = mr_file_name
+
+    if ar_flag:
+        if save_dir_flag:
+            ar_file = save_dir + "/" + ar_name
+        else:
+            ar_file = ar_name
+    else:
+        # Initialize ar_file name with "".
+        ar_file = ""
+
+        # For all split name with "." in file name...
+        for string_number in range(0, len(mp3_file_name.split("."))-1):
+            # Get all except like ".mp3".
+            ar_file += mp3_file_name.split(".")[string_number]
+
+        ar_file += "(AR).wav"
+    ######################### Naming part ############################################
+    # save file name ( ar_file ) to f_vocal.
+    f_vocal = ar_file
+
+    w_song = wave.open(f_song, "r")
+    w_inst = wave.open(f_inst, "r")
+    w_vocal = wave.open(f_vocal, "w")
+
+    song_framerate = float(w_song.getframerate())
+    song_nframes = w_song.getnframes()
+
+    vocal_framerate = song_framerate
+    vocal_nframes = song_nframes
+    vocal_nchannels = w_song.getnchannels()
+    comptype = "NONE"
+    compname = "not compressed"
+    sampwidth = 2
+
+    # Set wav file parameter.
+    w_vocal.setparams((vocal_nchannels, sampwidth, vocal_framerate, vocal_nframes, comptype, \
+    compname))
+
+    if vocal_nchannels == 2:
+        # If channer is 2...
+        for processed in range(0, song_nframes):
+            # for all range of songs, add euclidean distance with 2 song.
+            if processed % 100 == 0:
+                print str(processed) + " / " + str(song_nframes)
+            song_data = w_song.readframes(1)
+            inst_data = w_inst.readframes(1)
+            vocal_data = (struct.unpack("2h", song_data)[0] - struct.unpack("2h", inst_data)[0], \
+            struct.unpack("2h", song_data)[1] - struct.unpack("2h", inst_data)[1])
+            # if distance is in range of below...
+            if vocal_data[0] > -32769 and vocal_data[0] < 32768:
+                if vocal_data[1] > -32769 and vocal_data[1] < 32768:
+                    w_vocal.writeframes(struct.pack('h', int(vocal_data[0])))
+                    w_vocal.writeframes(struct.pack('h', int(vocal_data[1])))
+
+    # Close used files.
+    w_song.close()
+    w_inst.close()
+    w_vocal.close()
 
 def to_wav(dir_name, save_dir, file_name, addable_option="-n"):
     '''
@@ -29,13 +132,21 @@ def to_wav(dir_name, save_dir, file_name, addable_option="-n"):
 
     if file_name.split(".")[-1] != "wav":
         src_file = dir_name + "/"  + file_name
-        dest_file = save_dir + "/" + file_name.split(".")[0] + ".wav"
+
+        # if in case of file name has "."...
+        dest_file = ""
+        for string_number in range(0, len(file_name.split("."))-1):
+            # Get all except like ".mp3".
+            dest_file += file_name.split(".")[string_number]
+
+        dest_file = save_dir + "/" + dest_file + ".wav"
 
         #ffmpeg starting with full_name and wav_name
         # do system call " ffmpeg -i 'src_file' 'dest_file' "
         os.system('ffmpeg ' + addable_option + ' -i ' +\
         '\'' + src_file + '\' ' + '\'' + dest_file + '\'')
         return dest_file
+
     else:
         src_file = save_dir + "/"  + file_name
         return src_file
@@ -345,13 +456,13 @@ time_variation=0.5, time_warping=60, inner_debug=-1):
         if show_graph != -1:
             # if show graph is on...
             plt.figure()
-            plt.plot(real_weights)
+            plt.plot(real_output)
             plt.show()
 
         if save_graph != -1:
             # if save graph is on...
             plt.figure()
-            plt.plot(real_weights)
+            plt.plot(real_output)
             plt.savefig(str(dir_name)+"/"+str(file_name.split(".")[0] + ".png"))
 
 def get_music_time(sampling_rate, music_length):
@@ -385,6 +496,9 @@ def save_to(dir_name, file_name, weight_list, standard_output=50000):
     for weights in range(0, len(weight_list)):
         if weight_list[weights] > max_value:
             max_value = weight_list[weights]
+
+    for weights in range(0, len(weight_list)):
+        weight_list[weights] *= standard_output / max_value
 
     for weights in range(0, len(weight_list)):
         files.write(str(weight_list[weights] * standard_output / max_value)+ "\n")
