@@ -6,9 +6,8 @@ And related to check some musical analysis.
 import os
 import librosa as lb
 import beat_tie as bt2
+import numpy as np
 import matplotlib.pyplot as plt
-import wave
-import struct
 
 def vocalization(mp3_file, mr_file, save_dir=-1, mp3_dir=-1, mr_dir=-1, ar_name=-1):
 	######################### Control part ###########################################
@@ -36,6 +35,8 @@ def vocalization(mp3_file, mr_file, save_dir=-1, mp3_dir=-1, mr_dir=-1, ar_name=
     if ar_name != -1:
         # saving file name. if not, save with mp3_file(AR).mp3 or wav.
         ar_flag = True
+    ######################### Control part ###########################################
+    ######################### Naming part ############################################
 
     # mp3 file to wav files.
     if mp3_dir_flag:
@@ -47,8 +48,6 @@ def vocalization(mp3_file, mr_file, save_dir=-1, mp3_dir=-1, mr_dir=-1, ar_name=
         mr_file_name = to_wav(mr_dir, mr_dir, mr_file)
     else:
         mr_file_name = to_wav("", "", mr_file)
-    ######################### Control part ###########################################
-    ######################### Naming part ############################################
     # save file name to f_song and f_inst.
     f_song = mp3_file_name
     f_inst = mr_file_name
@@ -68,48 +67,29 @@ def vocalization(mp3_file, mr_file, save_dir=-1, mp3_dir=-1, mr_dir=-1, ar_name=
             ar_file += mp3_file_name.split(".")[string_number]
 
         ar_file += "(AR).wav"
-    ######################### Naming part ############################################
-    # save file name ( ar_file ) to f_vocal.
     f_vocal = ar_file
+    ######################### Naming part ############################################
+    print "Openning..."
+    f_song_audio, f_song_sampling_rate = lb.load(f_song)
+    f_inst_audio, _ = lb.load(f_inst)
 
-    w_song = wave.open(f_song, "r")
-    w_inst = wave.open(f_inst, "r")
-    w_vocal = wave.open(f_vocal, "w")
+    # Trim small size song.
+    print "Trimming..."
+    f_song_audio, _ = lb.effects.trim(f_song_audio)
+    f_inst_audio, _ = lb.effects.trim(f_inst_audio)
 
-    song_framerate = float(w_song.getframerate())
-    song_nframes = w_song.getnframes()
-
-    vocal_framerate = song_framerate
-    vocal_nframes = song_nframes
-    vocal_nchannels = w_song.getnchannels()
-    comptype = "NONE"
-    compname = "not compressed"
-    sampwidth = 2
-
-    # Set wav file parameter.
-    w_vocal.setparams((vocal_nchannels, sampwidth, vocal_framerate, vocal_nframes, comptype, \
-    compname))
-
-    if vocal_nchannels == 2:
-        # If channer is 2...
-        for processed in range(0, song_nframes):
-            # for all range of songs, add euclidean distance with 2 song.
-            if processed % 100 == 0:
-                print str(processed) + " / " + str(song_nframes)
-            song_data = w_song.readframes(1)
-            inst_data = w_inst.readframes(1)
-            vocal_data = (struct.unpack("2h", song_data)[0] - struct.unpack("2h", inst_data)[0], \
-            struct.unpack("2h", song_data)[1] - struct.unpack("2h", inst_data)[1])
-            # if distance is in range of below...
-            if vocal_data[0] > -32769 and vocal_data[0] < 32768:
-                if vocal_data[1] > -32769 and vocal_data[1] < 32768:
-                    w_vocal.writeframes(struct.pack('h', int(vocal_data[0])))
-                    w_vocal.writeframes(struct.pack('h', int(vocal_data[1])))
-
-    # Close used files.
-    w_song.close()
-    w_inst.close()
-    w_vocal.close()
+    f_vocal_audio = []
+    if len(f_song_audio) < len(f_inst_audio):
+        length = len(f_song_audio)
+    else:
+        length = len(f_inst_audio)
+    for process in range(0, length):
+        if process % 1000 == 0:
+            print str(process) + " / " + str(length)
+        f_vocal_audio.append(f_song_audio[process] - f_inst_audio[process])
+        if process % 1000 == 0:
+            print str(f_song_audio[process]) + " - " + str(f_inst_audio[process]) + " = " + str(f_song_audio[process] - f_inst_audio[process])
+    lb.output.write_wav(f_vocal, np.asarray(f_vocal_audio), f_song_sampling_rate)
 
 def to_wav(dir_name, save_dir, file_name, addable_option="-n"):
     '''
